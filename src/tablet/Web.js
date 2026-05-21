@@ -175,8 +175,12 @@ export default class Web {
 
     // ---- Settings / media files ------------------------------------------
     static getsettings (fcn) {
-        // Format expected by IO.js: "path mode camera"
-        cb(fcn, './ web YES');
+        // Format expected by editorMain/homeMain: "path,iOS-flag,record,camera".
+        // - path: filesystem root for media (web stores in IDB, so unused; "./")
+        // - iOS-flag: "0" means non-iOS (skip iOS path quirks)
+        // - record: "YES" enables sound recording (getUserMedia)
+        // - camera: "YES" enables camera tool in the paint editor
+        cb(fcn, './,0,YES,YES');
     }
     static cleanassets (ft, fcn) { cb(fcn, '1'); }
 
@@ -272,7 +276,9 @@ export default class Web {
     static recorddisappear (b, fcn) { cb(fcn, '1'); }
 
     // ---- Camera -----------------------------------------------------------
-    static hascamera () { return true; }
+    // Paint.rightPalette checks `OS.camera == '1'` (string) so return that,
+    // not a boolean.
+    static hascamera () { return '1'; }
     static startfeed (data, fcn) {
         if (!navigator.mediaDevices) { cb(fcn, '0'); return; }
         const constraints = {video: {facingMode: data && data.direction === 'back' ? 'environment' : 'user'}};
