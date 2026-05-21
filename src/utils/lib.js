@@ -11,6 +11,38 @@ export const fullscreenScaleMultiplier = 136;
 /* eslint-disable no-console */
 console.log('setting OS flags');
 /* eslint-enable no-console */
+
+// ScratchJr's source was written for iOS WebView and writes vendor-prefixed
+// CSS via `el.style.webkitTransform = ...`. Modern browsers (Chrome 1+,
+// Firefox 16+) require the unprefixed `transform`. Mirror the prefixed
+// setters to the standard ones so the original code paths work unmodified.
+(function mirrorWebkitStyle () {
+    if (typeof CSSStyleDeclaration === 'undefined') return;
+    var proto = CSSStyleDeclaration.prototype;
+    var pairs = [
+        ['webkitTransform', 'transform'],
+        ['webkitTransformOrigin', 'transformOrigin'],
+        ['webkitBoxShadow', 'boxShadow'],
+        ['webkitBorderRadius', 'borderRadius'],
+        ['webkitTransition', 'transition'],
+        ['webkitAnimation', 'animation'],
+        ['webkitUserSelect', 'userSelect']
+    ];
+    pairs.forEach(function (p) {
+        var prefixed = p[0], standard = p[1];
+        // Only patch when the prefixed property does NOT already map to the
+        // standard one (older Safari maps automatically).
+        try {
+            var d = Object.getOwnPropertyDescriptor(proto, prefixed);
+            if (d && d.set) return;
+        } catch (e) {}
+        Object.defineProperty(proto, prefixed, {
+            configurable: true,
+            get: function () { return this[standard]; },
+            set: function (v) { this[standard] = v; }
+        });
+    });
+})();
 export const isAndroid = (typeof AndroidInterface != 'undefined');
 // iOS only when running inside the ScratchJr iOS WebView, which injects
 // `window.tablet`. Plain desktop/mobile browsers fall through to the web bridge.
@@ -299,6 +331,14 @@ export function globaly (el) {
 export function setProps (object, props) {
     for (var i in props) {
         object[i] = props[i];
+        // ScratchJr's iOS-era source uses -webkit- prefixed CamelCase
+        // (webkitTransform, webkitBoxShadow, ...). Modern Chrome/Firefox
+        // require the unprefixed standard properties as well; set both so
+        // the same call works on web and WebView.
+        if (i.length > 6 && i.substr(0, 6) === 'webkit') {
+            var unprefixed = i.charAt(6).toLowerCase() + i.substr(7);
+            object[unprefixed] = props[i];
+        }
     }
 }
 
