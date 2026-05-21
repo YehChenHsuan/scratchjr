@@ -290,24 +290,36 @@ export default class Web {
         const constraints = {video: {facingMode: data && data.direction === 'back' ? 'environment' : 'user'}};
         navigator.mediaDevices.getUserMedia(constraints).then(s => {
             mediaStream = s;
-            videoEl = document.getElementById('scratchjr-camera-video') || document.createElement('video');
+            // Old video element may still be in the previous parent; remove
+            // it before placing again so the new spot reflects the click.
+            const oldVid = document.getElementById('scratchjr-camera-video');
+            if (oldVid && oldVid.parentNode) oldVid.parentNode.removeChild(oldVid);
+
+            videoEl = document.createElement('video');
             videoEl.id = 'scratchjr-camera-video';
             videoEl.autoplay = true;
             videoEl.playsInline = true;
             videoEl.muted = true;
+            // The paint editor's dark backdrop sits at z-index 10000 and
+            // can cover anything mounted on document.body. Mount inside the
+            // backdrop so we naturally sit above it; the camera UI buttons
+            // (phototopbar / snapshot) have higher z-index so they remain on
+            // top.
             videoEl.style.cssText = [
-                'position:absolute',
+                'position:fixed',
                 'left:' + (data.x | 0) + 'px',
                 'top:' + (data.y | 0) + 'px',
                 'width:' + (data.width | 0) + 'px',
                 'height:' + (data.height | 0) + 'px',
                 'object-fit:cover',
-                'z-index:9999',
+                'z-index:10050',
                 'pointer-events:none',
-                'transform:scaleX(-1)'  // mirror like a webcam selfie view
+                'transform:scaleX(-1)',
+                'background:#000'
             ].join(';');
             videoEl.srcObject = s;
-            (document.body || document.documentElement).appendChild(videoEl);
+            const host = document.getElementById('backdrop') || document.body;
+            host.appendChild(videoEl);
             videoEl.play().catch(() => {});
             cb(fcn, '1');
         }).catch((e) => {
@@ -336,7 +348,10 @@ export default class Web {
         }).catch(() => cb(fcn, '0'));
     }
     static captureimage (fcn) {
-        if (!videoEl || !videoEl.videoWidth) { cb(fcn, ''); return; }
+        if (!videoEl || !videoEl.videoWidth) {
+            Web._invokeCallback(fcn, '');
+            return;
+        }
         const canvas = document.createElement('canvas');
         canvas.width = videoEl.videoWidth;
         canvas.height = videoEl.videoHeight;
@@ -348,9 +363,25 @@ export default class Web {
         ctx.drawImage(videoEl, 0, 0);
         const dataUrl = canvas.toDataURL('image/png');
         const b64 = dataUrl.split(',')[1] || '';
-        // Native bridge returns the base64 directly. Some callers store via
-        // setmedia themselves; others expect raw base64 back here.
-        cb(fcn, b64);
+        Web._invokeCallback(fcn, b64);
+    }
+
+    // Some legacy native APIs accept a callback as either a function or a
+    // dotted global path string (e.g. "Camera.processimage"). The native
+    // bridge eval'd the string; on web we resolve it through window.
+    static _invokeCallback (fcn, value) {
+        if (typeof fcn === 'function') { setTimeout(() => fcn(value), 0); return; }
+        if (typeof fcn === 'string' && fcn) {
+            const parts = fcn.split('.');
+            let scope = window;
+            for (let i = 0; i < parts.length - 1; i++) {
+                scope = scope && scope[parts[i]];
+            }
+            const f = scope && scope[parts[parts.length - 1]];
+            if (typeof f === 'function') {
+                setTimeout(() => f.call(scope, value), 0);
+            }
+        }
     }
 
     // ---- Share & misc -----------------------------------------------------

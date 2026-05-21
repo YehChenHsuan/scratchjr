@@ -101,6 +101,7 @@ spriteform.off {visibility: hidden; };
     text-shadow: none;
     background: none;
     border: ${css_vh(0.00)} solid black;
+    z-index: 10100;
 }
 
 .actions .photobuttons {
@@ -150,6 +151,7 @@ spriteform.off {visibility: hidden; };
     height: ${css_vh(10.29)};
     width: 100%;
     pointer-events: auto;
+    z-index: 10100;
 }
 
 .snapshot {
