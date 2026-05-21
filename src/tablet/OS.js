@@ -1,4 +1,4 @@
-import {isiOS, isAndroid, gn} from '../utils/lib';
+import {isiOS, isAndroid, isWeb, gn} from '../utils/lib';
 import IO from './IO';
 import iOS from './iOS';
 import Android from './Android';
@@ -6,10 +6,6 @@ import Web from './Web';
 import Lobby from '../lobby/Lobby';
 import Alert from '../editor/ui/Alert';
 import ScratchAudio from '../utils/ScratchAudio';
-
-// True when running as a pure web app (GitHub Pages etc.), not inside an
-// iOS/Android WebView. Treat anything that isn't a known native bridge as web.
-const isWeb = !isiOS && !isAndroid;
 
 //////////////////////////////////////////////////
 //  Tablet interface functions

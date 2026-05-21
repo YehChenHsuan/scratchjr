@@ -11,8 +11,11 @@ export const fullscreenScaleMultiplier = 136;
 /* eslint-disable no-console */
 console.log('setting OS flags');
 /* eslint-enable no-console */
-export const isiOS = (typeof AndroidInterface == 'undefined');
 export const isAndroid = (typeof AndroidInterface != 'undefined');
+// iOS only when running inside the ScratchJr iOS WebView, which injects
+// `window.tablet`. Plain desktop/mobile browsers fall through to the web bridge.
+export const isiOS = !isAndroid && (typeof window.tablet === 'object' && window.tablet !== null);
+export const isWeb = !isAndroid && !isiOS;
 
 export function libInit () {
     frame = document.getElementById('frame');

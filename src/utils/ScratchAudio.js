@@ -1,4 +1,4 @@
-import {isAndroid} from './lib';
+import {isAndroid, isWeb} from './lib';
 import Sound from './Sound';
 import OS from '../tablet/OS';
 
@@ -39,7 +39,7 @@ export default class ScratchAudio {
         if (!prefix) {
             prefix = '';
         }
-        if (!isAndroid) {
+        if (!isAndroid && !isWeb) {
             prefix = 'HTML5/';
         }
         uiSounds = {};
@@ -84,7 +84,7 @@ export default class ScratchAudio {
             return;
         }
         var dir = '';
-        if (!isAndroid) {
+        if (!isAndroid && !isWeb) {
             if (md5.indexOf('/') > -1) dir = 'HTML5/';
             else if (md5.indexOf('wav') > -1) dir = 'Documents';
         }

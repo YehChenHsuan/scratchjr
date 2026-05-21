@@ -198,7 +198,9 @@ export default class Web {
         tx(STORE_MEDIA, 'readwrite').then(s => p(s.delete(file))).then(() => cb(fcn, '1'));
     }
     static getfile (name, fcn) {
-        tx(STORE_FILES).then(s => p(s.get(name))).then(rec => cb(fcn, rec ? rec.data : ''));
+        // Native bridges return base64-encoded contents; callers atob() it.
+        // Default to base64("0") so callers parsing it as a number get 0.
+        tx(STORE_FILES).then(s => p(s.get(name))).then(rec => cb(fcn, rec ? rec.data : 'MA=='));
     }
     static setfile (name, data, fcn) {
         tx(STORE_FILES, 'readwrite').then(s => p(s.put({name, data}))).then(() => cb(fcn, '1'));
