@@ -48,11 +48,10 @@ export default class Stage {
 
     setStageScaleAndPosition (scale, x, y) {
         this.stageScale = scale;
-        setProps(gn('stage').style, {
-            webkitTransform: 'translate(' + (-this.width / 2) + 'px, ' + (-this.height / 2) + 'px) ' +
-                'scale(' + scale + ') ' +
-                'translate(' + (this.width / 2 + x) + 'px, ' + (this.height / 2 + y) + 'px)'
-        });
+        var t = 'translate(' + (-this.width / 2) + 'px, ' + (-this.height / 2) + 'px) ' +
+            'scale(' + scale + ') ' +
+            'translate(' + (this.width / 2 + x) + 'px, ' + (this.height / 2 + y) + 'px)';
+        setProps(gn('stage').style, {webkitTransform: t, transform: t});
     }
 
     getPagesID () {

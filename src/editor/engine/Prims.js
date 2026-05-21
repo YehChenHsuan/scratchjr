@@ -19,6 +19,7 @@ export default class Prims {
         Prims.table.onflag = Prims.Ignore;
         Prims.table.onmessage = Prims.Ignore;
         Prims.table.onclick = Prims.Ignore;
+        Prims.table.ongesture = Prims.Ignore;
         Prims.table.ontouch = Prims.OnTouch;
         Prims.table.onchat = Prims.Ignore;
         Prims.table.repeat = Prims.Repeat;

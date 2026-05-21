@@ -4,9 +4,11 @@
   "description": "ScratchJr",
   "scripts": {
     "lint": "eslint src/**",
-    "watch": "webpack --mode=development --progress --hide-modules --watch",
-    "dev": "webpack --mode=development --progress --hide-modules",
-    "build": "webpack --mode=production --progress --hide-modules"
+    "watch": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development --progress --hide-modules --watch",
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development --progress --hide-modules",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --progress --hide-modules",
+    "build:web": "node scripts/build-web.js",
+    "serve": "node scripts/serve.js"
   },
   "author": "Massachusetts Institute of Technology",
   "license": "BSD-3-Clause",

@@ -10,6 +10,7 @@ import {homeMain} from './home';
 import {editorMain} from './editor';
 import {gettingStartedMain} from './gettingstarted';
 import {inappInterfaceGuide, inappAbout, inappBlocksGuide, inappPaintEditorGuide} from './inapp';
+import {aiTrainerMain} from './aitrainer';
 
 function loadSettings (settingsRoot, whenDone) {
     IO.requestFromServer(settingsRoot + 'settings.json', (result) => {
@@ -72,6 +73,13 @@ window.onload = () => {
         preprocessAndLoadCss('css', 'css/base.css');
         preprocessAndLoadCss('css', 'css/gs.css');
         entryFunction = () => OS.waitForInterface(gettingStartedMain);
+        break;
+    case 'aitrainer':
+        // AI gesture trainer page (web-only)
+        preprocessAndLoadCss('css', 'css/font.css');
+        preprocessAndLoadCss('css', 'css/base.css');
+        preprocessAndLoadCss('css', 'css/aitrainer.css');
+        entryFunction = () => OS.waitForInterface(aiTrainerMain);
         break;
     case 'inappAbout':
         // About ScratchJr in-app help frame
