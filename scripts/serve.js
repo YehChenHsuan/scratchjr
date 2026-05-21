@@ -31,6 +31,7 @@ http.createServer((req, res) => {
     fs.readFile(filePath, (err, data) => {
         if (err) { res.statusCode = 404; res.end('Not found: ' + urlPath); return; }
         res.setHeader('Content-Type', MIME[path.extname(filePath)] || 'application/octet-stream');
+        res.setHeader('Cache-Control', 'no-store, must-revalidate');
         res.end(data);
     });
 }).listen(PORT, () => {

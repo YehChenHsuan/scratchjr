@@ -203,7 +203,13 @@ export default class Web {
         tx(STORE_FILES).then(s => p(s.get(name))).then(rec => cb(fcn, rec ? rec.data : 'MA=='));
     }
     static setfile (name, data, fcn) {
-        tx(STORE_FILES, 'readwrite').then(s => p(s.put({name, data}))).then(() => cb(fcn, '1'));
+        // ScratchJr callers pass raw text (e.g. scrollTop as a number-string);
+        // native bridges store the bytes and getfile returns base64.
+        // Mirror that here so the round-trip via atob() works.
+        let encoded;
+        try { encoded = btoa(unescape(encodeURIComponent(String(data)))); }
+        catch (e) { encoded = 'MA=='; }
+        tx(STORE_FILES, 'readwrite').then(s => p(s.put({name, data: encoded}))).then(() => cb(fcn, '1'));
     }
 
     // ---- Sound ------------------------------------------------------------
