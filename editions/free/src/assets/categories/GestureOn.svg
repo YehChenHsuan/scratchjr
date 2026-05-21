@@ -1,10 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <rect width="51" height="57" rx="6" fill="#00BCD4"/>
-  <g fill="#FFFFFF" transform="translate(10 8)">
-    <rect x="6" y="14" width="4" height="20" rx="1.5"/>
-    <rect x="12" y="6" width="4" height="28" rx="1.5"/>
-    <rect x="18" y="4" width="4" height="30" rx="1.5"/>
-    <rect x="24" y="8" width="4" height="26" rx="1.5"/>
-    <path d="M2,30 Q2,42 16,42 L24,42 Q32,42 32,32 L32,24 L28,24 L28,30 L2,30 Z"/>
+  <linearGradient id="ga" gradientUnits="userSpaceOnUse" x1="25.5" y1="2" x2="25.5" y2="55">
+    <stop offset="0" stop-color="#fff"/>
+    <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
+    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <path opacity=".75" fill="url(#ga)" d="M10.556 54.5c-4.411 0-8-3.589-8-8v-30c0-4.411 3.589-8 8-8h30c4.411 0 8 3.589 8 8v30c0 4.411-3.589 8-8 8h-30z"/>
+  <path fill="#0097A7" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <path fill="#00BCD4" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
+  <g fill="#FFFFFF" transform="translate(13 17)">
+    <rect x="4" y="9" width="3" height="13" rx="1.2"/>
+    <rect x="8.5" y="3" width="3" height="19" rx="1.2"/>
+    <rect x="13" y="1.5" width="3" height="20.5" rx="1.2"/>
+    <rect x="17.5" y="5" width="3" height="17" rx="1.2"/>
+    <path d="M1.5 19 Q1.5 28 11 28 L18 28 Q24 28 24 21.5 L24 16 L21 16 L21 20 L1.5 20 Z"/>
   </g>
+  <path fill-opacity=".17" d="M40.564 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.861 0 7-3.141 7-7v-30c0-3.86-3.137-7-7-7zm5.5 37c0 3.033-2.467 5.5-5.5 5.5h-30a5.506 5.506 0 0 1-5.5-5.5v-30c0-3.033 2.467-5.5 5.5-5.5h30c3.033 0 5.5 2.467 5.5 5.5v30z"/>
 </svg>

@@ -229,14 +229,14 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)};
     z-index: 60;
-    width: ${354 * scaleMultiplier}px;
+    width: ${408 * scaleMultiplier}px;
     height: ${64 * scaleMultiplier}px;
     overflow: hidden;
 }
 
 #blockspalette .categoryselector .catbkg{
     position: relative;
-    width: ${708 * scaleMultiplier}px;
+    width: ${816 * scaleMultiplier}px;
     height: ${128 * scaleMultiplier}px;
     background: #E9ECF0;
     overflow: hidden;
@@ -244,7 +244,7 @@ div.frame {
 }
 
 .catbkg .catimage{
-    width: ${708 * scaleMultiplier}px;
+    width: ${816 * scaleMultiplier}px;
     height: ${132 * scaleMultiplier}px;
     background: url('../assets/categories/categoryimage.svg');
     background-size: 100%;
@@ -255,7 +255,7 @@ div.frame {
     position: relative;
     margin: ${css_vh(0)} ${css_vh(0)} ${css_vh(0)};
     height: ${64 * scaleMultiplier}px;
-    width: ${659 * scaleMultiplier}px;
+    width: ${605 * scaleMultiplier}px;
     z-index:4;
     overflow: hidden;
 }
