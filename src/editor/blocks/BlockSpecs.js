@@ -169,6 +169,11 @@ export default class BlockSpecs {
                 BlockSpecs.getImageFrom('assets/categories/StopOn', 'svg'),
                 BlockSpecs.getImageFrom('assets/categories/StopOff', 'svg'),
                 window.Settings.categoryStopColor
+            ],
+            [
+                BlockSpecs.getImageFrom('assets/categories/GestureOn', 'svg'),
+                BlockSpecs.getImageFrom('assets/categories/GestureOff', 'svg'),
+                (window.Settings.categoryGestureColor || '#00BCD4')
             ]
         );
     }
@@ -180,7 +185,8 @@ export default class BlockSpecs {
             ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
             [],
             ['wait', 'stopmine', 'setspeed', 'repeat'],
-            ['endstack', 'forever']];
+            ['endstack', 'forever'],
+            ['ongesture']];
     }
 
     ///////////////////////////////
@@ -210,6 +216,9 @@ export default class BlockSpecs {
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'ontouch': ['ontouch', BlockSpecs.getImageFrom('assets/blockicons/Bump', 'svg'),
                 BlockSpecs.yellowStart, null, null, BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+            'ongesture': ['ongesture', BlockSpecs.getImageFrom('assets/blockicons/Gesture', 'svg'),
+                BlockSpecs.yellowStart, 'g', 'gesture_1_up',
+                BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'message': ['message', sendshapes, BlockSpecs.yellowCmd, 'm', 'Orange',
                 BlockSpecs.yellowCmdH, null, null, BlockSpecs.cmdS],
 

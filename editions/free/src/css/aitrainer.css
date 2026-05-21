@@ -1,0 +1,24 @@
+/* AI Gesture Trainer (web-only) */
+body { margin: 0; font-family: sans-serif; background: #ECEFF1; color: #263238; }
+#aitrainer-root { display: flex; flex-direction: column; height: 100vh; }
+.ait-header { background: #00BCD4; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 14px; }
+.ait-header h1 { font-size: 18px; margin: 0; font-weight: 500; }
+.ait-header h1 small { font-weight: 300; opacity: .8; margin-left: 8px; font-size: 13px; }
+.ait-header button { background: rgba(0,0,0,.18); color: #fff; border: 0; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+.ait-body { display: flex; flex: 1; min-height: 0; }
+.ait-video-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; position: relative; }
+#gesture-trainer-video { width: 100%; max-width: 640px; max-height: 80%; transform: scaleX(-1); }
+.ait-status { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,.55); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 14px; }
+.ait-controls { width: 360px; padding: 14px; background: #fff; overflow-y: auto; box-shadow: -2px 0 8px rgba(0,0,0,.08); }
+.ait-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+.ait-cell { background: #F5F5F5; border: 2px solid transparent; border-radius: 6px; padding: 8px 4px; text-align: center; cursor: pointer; user-select: none; }
+.ait-cell:hover { background: #E0F7FA; }
+.ait-cell.selected { border-color: #00BCD4; background: #B2EBF2; }
+.ait-cell.trained { border-color: #4CAF50; }
+.ait-cell-label { font-size: 13px; }
+.ait-cell-count { font-size: 11px; color: #607D8B; margin-top: 2px; }
+.ait-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+.ait-actions button { padding: 10px; border: 0; border-radius: 4px; background: #00BCD4; color: #fff; cursor: pointer; font-size: 14px; }
+.ait-actions button:hover { background: #00ACC1; }
+.ait-progress { background: #ECEFF1; padding: 8px; border-radius: 4px; font-size: 13px; min-height: 1.2em; }
+.ait-result { margin-top: 10px; padding: 8px; background: #FFF8E1; border-radius: 4px; font-size: 13px; min-height: 1.2em; }

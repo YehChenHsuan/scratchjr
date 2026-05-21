@@ -15,6 +15,7 @@
     "categorySoundColor": "#48CC7E",
     "categoryFlowColor": "#FFBE57",
     "categoryStopColor": "#D62222",
+    "categoryGestureColor": "#00BCD4",
     "paletteBlockShadowOpacity": 0.8,
     "autoSaveInterval": 30000,
     "defaultLocale": "en",

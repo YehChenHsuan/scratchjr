@@ -6,7 +6,9 @@
     "lint": "eslint src/**",
     "watch": "webpack --mode=development --progress --hide-modules --watch",
     "dev": "webpack --mode=development --progress --hide-modules",
-    "build": "webpack --mode=production --progress --hide-modules"
+    "build": "webpack --mode=production --progress --hide-modules",
+    "build:web": "node scripts/build-web.js",
+    "serve": "node scripts/serve.js"
   },
   "author": "Massachusetts Institute of Technology",
   "license": "BSD-3-Clause",
