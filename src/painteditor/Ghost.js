@@ -111,9 +111,71 @@ export default class Ghost {
         var id = maskData[color];
         if (id) {
             return Ghost.hitSomething(pt, id, color);
-        } else {
-            return Ghost.notHitted(pt);
         }
+        // The bitmap mask test misses thin strokes when the click lands a
+        // pixel or two off — common with a mouse compared to a finger.
+        // Fall back to SVG's native getIntersectionList around a small box.
+        var fallback = Ghost.fuzzyHit(pt);
+        if (fallback) {
+            // For paintbucket/camera, hitSomething ignores the passed id and
+            // re-runs getHitObject (which also misses). Short-circuit the
+            // ghost handling and return the fallback element directly.
+            if (Paint.mode === 'paintbucket' || Paint.mode === 'camera') {
+                return Ghost.setGhostTo(fallback);
+            }
+            return Ghost.hitSomething(pt, fallback.id, 0);
+        }
+        return Ghost.notHitted(pt);
+    }
+
+    static fuzzyHit (pt) {
+        if (!Paint.root || !Paint.root.createSVGRect) return null;
+        // Mouse clicks are precise but stroke widths are 1-2px — give the
+        // user a much larger tolerance than a finger pad would need.
+        // pt is in SVG userspace, so this is roughly pad/scaleMultiplier
+        // viewport pixels.
+        var pad = 20;
+        var rect = Paint.root.createSVGRect();
+        rect.x = pt.x - pad;
+        rect.y = pt.y - pad;
+        rect.width = pad * 2;
+        rect.height = pad * 2;
+        var list = null;
+        try { list = Paint.root.getIntersectionList(rect, null); } catch (e) {}
+        if (!list || list.length === 0) {
+            // Fallback to DOM hit-test on the SVG layer when the SVG API
+            // is missing or returns empty.
+            return Ghost.elementHit(pt);
+        }
+        for (var i = list.length - 1; i >= 0; i--) {
+            var el = list[i];
+            if (el.id && el.id !== 'staticbkg' && el.getAttribute('fixed') !== 'yes') {
+                return el;
+            }
+        }
+        return list[list.length - 1];
+    }
+
+    // Last-ditch hit using the platform's pointer-event hit testing.
+    static elementHit (pt) {
+        if (!Paint.root) return null;
+        // pt is in SVG userspace; convert to client coords.
+        var p = Paint.root.createSVGPoint();
+        p.x = pt.x; p.y = pt.y;
+        var ctm = Paint.root.getScreenCTM();
+        if (!ctm) return null;
+        var screen = p.matrixTransform(ctm);
+        var el = document.elementFromPoint(screen.x, screen.y);
+        while (el && el !== document.body) {
+            if (el.tagName && el.id && el.id !== 'staticbkg' &&
+                el.getAttribute && el.getAttribute('fixed') !== 'yes' &&
+                ['path', 'ellipse', 'rect', 'polygon', 'polyline', 'image']
+                    .indexOf(el.tagName.toLowerCase()) >= 0) {
+                return el;
+            }
+            el = el.parentElement;
+        }
+        return null;
     }
 
     static hitSomething (pt, id) {

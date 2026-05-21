@@ -279,31 +279,78 @@ export default class Web {
     // Paint.rightPalette checks `OS.camera == '1'` (string) so return that,
     // not a boolean.
     static hascamera () { return '1'; }
+
+    // Native bridges overlay a hardware camera view at the given screen
+    // coords. On web we mount a <video> element positioned absolutely so
+    // it covers the camera-mode mask in the paint editor.
     static startfeed (data, fcn) {
-        if (!navigator.mediaDevices) { cb(fcn, '0'); return; }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            cb(fcn, '0'); return;
+        }
         const constraints = {video: {facingMode: data && data.direction === 'back' ? 'environment' : 'user'}};
         navigator.mediaDevices.getUserMedia(constraints).then(s => {
             mediaStream = s;
-            videoEl = document.createElement('video');
-            videoEl.srcObject = s; videoEl.play();
+            videoEl = document.getElementById('scratchjr-camera-video') || document.createElement('video');
+            videoEl.id = 'scratchjr-camera-video';
+            videoEl.autoplay = true;
+            videoEl.playsInline = true;
+            videoEl.muted = true;
+            videoEl.style.cssText = [
+                'position:absolute',
+                'left:' + (data.x | 0) + 'px',
+                'top:' + (data.y | 0) + 'px',
+                'width:' + (data.width | 0) + 'px',
+                'height:' + (data.height | 0) + 'px',
+                'object-fit:cover',
+                'z-index:9999',
+                'pointer-events:none',
+                'transform:scaleX(-1)'  // mirror like a webcam selfie view
+            ].join(';');
+            videoEl.srcObject = s;
+            (document.body || document.documentElement).appendChild(videoEl);
+            videoEl.play().catch(() => {});
             cb(fcn, '1');
-        }).catch(() => cb(fcn, '0'));
+        }).catch((e) => {
+            console.warn('[Web.startfeed]', e && e.message);
+            cb(fcn, '0');
+        });
     }
     static stopfeed (fcn) {
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-        mediaStream = null; videoEl = null;
+        mediaStream = null;
+        if (videoEl && videoEl.parentNode) videoEl.parentNode.removeChild(videoEl);
+        videoEl = null;
         cb(fcn, '1');
     }
-    static choosecamera (mode, fcn) { cb(fcn, '1'); }
+    static choosecamera (mode, fcn) {
+        // Switch between front (user) and back (environment) camera.
+        if (!mediaStream) { cb(fcn, '0'); return; }
+        const direction = (mode && mode.direction) || (mode === 'back' ? 'back' : 'front');
+        mediaStream.getTracks().forEach(t => t.stop());
+        navigator.mediaDevices.getUserMedia({
+            video: {facingMode: direction === 'back' ? 'environment' : 'user'}
+        }).then(s => {
+            mediaStream = s;
+            if (videoEl) videoEl.srcObject = s;
+            cb(fcn, '1');
+        }).catch(() => cb(fcn, '0'));
+    }
     static captureimage (fcn) {
-        if (!videoEl) { cb(fcn, ''); return; }
+        if (!videoEl || !videoEl.videoWidth) { cb(fcn, ''); return; }
         const canvas = document.createElement('canvas');
-        canvas.width = videoEl.videoWidth; canvas.height = videoEl.videoHeight;
-        canvas.getContext('2d').drawImage(videoEl, 0, 0);
-        const b64 = canvas.toDataURL('image/png').split(',')[1];
-        const name = 'photo_' + Date.now() + '.png';
-        tx(STORE_MEDIA, 'readwrite').then(s => p(s.put({md5: name, data: b64, ext: 'png'})))
-            .then(() => cb(fcn, name));
+        canvas.width = videoEl.videoWidth;
+        canvas.height = videoEl.videoHeight;
+        const ctx = canvas.getContext('2d');
+        // Match the visual mirror in the preview so the saved photo
+        // looks like what the user just saw.
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(videoEl, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+        const b64 = dataUrl.split(',')[1] || '';
+        // Native bridge returns the base64 directly. Some callers store via
+        // setmedia themselves; others expect raw base64 back here.
+        cb(fcn, b64);
     }
 
     // ---- Share & misc -----------------------------------------------------
