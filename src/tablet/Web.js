@@ -281,8 +281,9 @@ export default class Web {
     static hascamera () { return '1'; }
 
     // Native bridges overlay a hardware camera view at the given screen
-    // coords. On web we mount a <video> element positioned absolutely so
-    // it covers the camera-mode mask in the paint editor.
+    // coords. On web we mount a <video> covering the entire workspace
+    // (mx, my, mw, mh) and lay the supplied mask image on top so only the
+    // target shape's region shows live video, just like the iOS preview.
     static startfeed (data, fcn) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             cb(fcn, '0'); return;
@@ -290,37 +291,67 @@ export default class Web {
         const constraints = {video: {facingMode: data && data.direction === 'back' ? 'environment' : 'user'}};
         navigator.mediaDevices.getUserMedia(constraints).then(s => {
             mediaStream = s;
-            // Old video element may still be in the previous parent; remove
-            // it before placing again so the new spot reflects the click.
-            const oldVid = document.getElementById('scratchjr-camera-video');
-            if (oldVid && oldVid.parentNode) oldVid.parentNode.removeChild(oldVid);
+            // Remove any leftover preview/mask from a prior session.
+            ['scratchjr-camera-video', 'scratchjr-camera-mask'].forEach(id => {
+                const old = document.getElementById(id);
+                if (old && old.parentNode) old.parentNode.removeChild(old);
+            });
+
+            // Full workspace area = where the painting canvas sits.
+            const mx = (data.mx | 0), my = (data.my | 0);
+            const mw = (data.mw | 0) || (data.width | 0);
+            const mh = (data.mh | 0) || (data.height | 0);
 
             videoEl = document.createElement('video');
             videoEl.id = 'scratchjr-camera-video';
             videoEl.autoplay = true;
             videoEl.playsInline = true;
             videoEl.muted = true;
-            // The paint editor's dark backdrop sits at z-index 10000 and
-            // can cover anything mounted on document.body. Mount inside the
-            // backdrop so we naturally sit above it; the camera UI buttons
-            // (phototopbar / snapshot) have higher z-index so they remain on
-            // top.
             videoEl.style.cssText = [
                 'position:fixed',
-                'left:' + (data.x | 0) + 'px',
-                'top:' + (data.y | 0) + 'px',
-                'width:' + (data.width | 0) + 'px',
-                'height:' + (data.height | 0) + 'px',
+                'left:' + mx + 'px',
+                'top:' + my + 'px',
+                'width:' + mw + 'px',
+                'height:' + mh + 'px',
                 'object-fit:cover',
                 'z-index:10050',
                 'pointer-events:none',
-                'transform:scaleX(-1)',
+                'transform:scaleX(-1)',  // selfie-style mirror
                 'background:#000'
             ].join(';');
             videoEl.srcObject = s;
+
             const host = document.getElementById('backdrop') || document.body;
             host.appendChild(videoEl);
             videoEl.play().catch(() => {});
+
+            // Mask image hides every region except the target shape, so the
+            // live video peeks through only the chosen outline.
+            if (data.image) {
+                const mask = document.createElement('img');
+                mask.id = 'scratchjr-camera-mask';
+                mask.src = data.image;
+                mask.style.cssText = [
+                    'position:fixed',
+                    'left:' + mx + 'px',
+                    'top:' + my + 'px',
+                    'width:' + mw + 'px',
+                    'height:' + mh + 'px',
+                    'z-index:10060',
+                    'pointer-events:none'
+                ].join(';');
+                host.appendChild(mask);
+            }
+            // Track the target rect so captureimage knows what to crop.
+            videoEl.dataset.targetX = (data.x | 0);
+            videoEl.dataset.targetY = (data.y | 0);
+            videoEl.dataset.targetW = (data.width | 0);
+            videoEl.dataset.targetH = (data.height | 0);
+            videoEl.dataset.workspaceX = mx;
+            videoEl.dataset.workspaceY = my;
+            videoEl.dataset.workspaceW = mw;
+            videoEl.dataset.workspaceH = mh;
+
             cb(fcn, '1');
         }).catch((e) => {
             console.warn('[Web.startfeed]', e && e.message);
@@ -330,7 +361,10 @@ export default class Web {
     static stopfeed (fcn) {
         if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
         mediaStream = null;
-        if (videoEl && videoEl.parentNode) videoEl.parentNode.removeChild(videoEl);
+        ['scratchjr-camera-video', 'scratchjr-camera-mask'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+        });
         videoEl = null;
         cb(fcn, '1');
     }
