@@ -238,9 +238,14 @@ export default class Library {
         img.style.top = Math.floor(((h - (scale * tb.h)) / 2) + (9 * scaleMultiplier)) + 'px';
         img.style.position = 'relative';
 
-        // Cached downsized-thumbnails are in pnglibrary
+        // Cached downsized-thumbnails are in pnglibrary on native builds.
+        // On web, fall back to the original SVG when the cached PNG is absent.
         var pngPath = MediaLib.path.replace('svg', 'png');
         img.src = pngPath + IO.getFilename(md5) + '.png';
+        img.onerror = function () {
+            img.onerror = null;
+            img.src = MediaLib.path + md5;
+        };
 
         tb.ontouchstart = function (evt) {
             fcn(evt, tb);
