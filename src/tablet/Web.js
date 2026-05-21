@@ -297,10 +297,17 @@ export default class Web {
                 if (old && old.parentNode) old.parentNode.removeChild(old);
             });
 
-            // Full workspace area = where the painting canvas sits.
-            const mx = (data.mx | 0), my = (data.my | 0);
-            const mw = (data.mw | 0) || (data.width | 0);
-            const mh = (data.mh | 0) || (data.height | 0);
+            // data.mx/my/mw/mh from Camera.startFeed are computed in the
+            // pre-scale SVG userspace and don't account for CSS transforms
+            // applied to the maincanvas, so trusting them produces either a
+            // tiny preview or a viewport-sized overlay. Pull the real on-
+            // screen rect of the painting canvas directly.
+            const mc = document.getElementById('maincanvas');
+            const rect = mc && mc.getBoundingClientRect();
+            const mx = rect ? Math.round(rect.left) : (data.mx | 0);
+            const my = rect ? Math.round(rect.top) : (data.my | 0);
+            const mw = rect ? Math.round(rect.width) : ((data.mw | 0) || (data.width | 0));
+            const mh = rect ? Math.round(rect.height) : ((data.mh | 0) || (data.height | 0));
 
             videoEl = document.createElement('video');
             videoEl.id = 'scratchjr-camera-video';
@@ -342,13 +349,17 @@ export default class Web {
                 ].join(';');
                 host.appendChild(mask);
             }
-            // Track the target rect so captureimage knows what to crop.
-            videoEl.dataset.targetX = (data.x | 0);
-            videoEl.dataset.targetY = (data.y | 0);
-            videoEl.dataset.targetW = (data.width | 0);
-            videoEl.dataset.targetH = (data.height | 0);
-            videoEl.dataset.workspaceX = mx;
-            videoEl.dataset.workspaceY = my;
+            // Convert the target shape rect from workspace userspace
+            // (Paint.workspaceWidth x workspaceHeight, e.g. 432x384) into
+            // the actual on-screen pixel space (mw x mh) so the cropper
+            // can pull the right region out of the camera frame.
+            const wsUserW = (data.mw | 0) || Number(data.workspaceWidth) || 432;
+            const wsUserH = (data.mh | 0) || Number(data.workspaceHeight) || 384;
+            const sx = mw / wsUserW, sy = mh / wsUserH;
+            videoEl.dataset.targetX = ((data.x | 0)) * sx;
+            videoEl.dataset.targetY = ((data.y | 0)) * sy;
+            videoEl.dataset.targetW = ((data.width | 0)) * sx;
+            videoEl.dataset.targetH = ((data.height | 0)) * sy;
             videoEl.dataset.workspaceW = mw;
             videoEl.dataset.workspaceH = mh;
 
@@ -386,15 +397,43 @@ export default class Web {
             Web._invokeCallback(fcn, '');
             return;
         }
+        // The preview covers the whole maincanvas; the target shape's
+        // bounding box in workspace coordinates was stashed on the video
+        // element. Crop the captured frame to that box so the photo fed to
+        // SVGImage.addCameraFill matches what the user saw "inside" the
+        // mask hole — otherwise the image is scaled to fill the shape's
+        // viewbox and the subject appears shifted.
+        const tx = Number(videoEl.dataset.targetX) || 0;
+        const ty = Number(videoEl.dataset.targetY) || 0;
+        const tw = Number(videoEl.dataset.targetW) || 0;
+        const th = Number(videoEl.dataset.targetH) || 0;
+        const wsW = Number(videoEl.dataset.workspaceW) || videoEl.videoWidth;
+        const wsH = Number(videoEl.dataset.workspaceH) || videoEl.videoHeight;
+
+        const vw = videoEl.videoWidth, vh = videoEl.videoHeight;
+        // object-fit:cover scaling — video frame is centered + cropped to
+        // fill the preview rect. Match that math when picking source rect.
+        const scale = Math.max(vw / wsW, vh / wsH);
+        const coverW = vw / scale, coverH = vh / scale;  // visible region in workspace px
+        const offX = (wsW - coverW) / 2;
+        const offY = (wsH - coverH) / 2;
+
+        // Map target rect from workspace coords -> video frame coords.
+        let sx = (tx - offX) * scale;
+        let sy = (ty - offY) * scale;
+        let sw = tw * scale;
+        let sh = th * scale;
+        if (!sw || !sh) { sx = 0; sy = 0; sw = vw; sh = vh; }
+
         const canvas = document.createElement('canvas');
-        canvas.width = videoEl.videoWidth;
-        canvas.height = videoEl.videoHeight;
+        canvas.width = Math.max(1, Math.round(sw));
+        canvas.height = Math.max(1, Math.round(sh));
         const ctx = canvas.getContext('2d');
-        // Match the visual mirror in the preview so the saved photo
-        // looks like what the user just saw.
+        // Match the mirrored preview so the saved photo looks like what
+        // the user just framed up.
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
-        ctx.drawImage(videoEl, 0, 0);
+        ctx.drawImage(videoEl, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/png');
         const b64 = dataUrl.split(',')[1] || '';
         Web._invokeCallback(fcn, b64);
