@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <!-- Built directly on top of StopOff.svg's layer structure so the
-       button still looks raised with a subtle highlight at the top —
-       the only differences are colour (red -> teal) and the central
-       glyph (P letter -> hand). Keep all the gradients and the khaki
-       press-baseplate (#C9BF8B) intact. -->
+  <!-- Direct copy of StopOff.svg's full layer stack (the khaki press
+       baseplate at y=1.5, the inner frame at y=2 so it sits 7.67px
+       higher than the On state, the white-highlight outline and the
+       inset gradient).  Red colours -> teal, and the central glyph
+       is moved up to match the inner frame's shifted Y. -->
   <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.445" y1="1761.074" x2="25.445" y2="1716.074" gradientTransform="translate(0 -1706.074)">
     <stop offset="0" stop-opacity=".5"/>
     <stop offset=".09" stop-opacity=".455"/>
@@ -30,18 +30,16 @@
     <stop offset="1" stop-color="#fff" stop-opacity="0"/>
   </linearGradient>
   <path fill="url(#c)" d="M4.056 38.5c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5h-30a6.508 6.508 0 0 0-6.5 6.5v30z"/>
-  <!-- Hand glyph (palm + 4 fingers + thumb) replacing the StopOff "P" -->
-  <g fill="#FFFFFF">
-    <rect x="14" y="25" width="22" height="20" rx="6"/>
-    <rect x="15.5" y="14" width="4.5" height="14" rx="2.2"/>
-    <rect x="21"   y="11" width="4.5" height="17" rx="2.2"/>
-    <rect x="26.5" y="13" width="4.5" height="15" rx="2.2"/>
-    <rect x="32"   y="16" width="4.5" height="12" rx="2.2"/>
-    <path d="M13 28
-             c-1.8 0 -3.4 1.3 -3.4 3.2
-             0  1.8 1.5 3.3 3.4 3.3
-             1.8 0 3.4 -1.4 3.4 -3.2
-             v-2.5
-             c0 -.5 -.4 -.8 -.9 -.8 z"/>
+  <!-- Hand glyph — same path as GestureOn but shifted up by 7.67 so it
+       stays centred on the Off panel (which itself sits 7.67 above the
+       On panel). -->
+  <g transform="translate(10.5 9.33)" opacity=".9">
+    <g fill="#FFFFFF">
+      <path d="M2 16 c0 -1.5 1 -2.5 2.5 -2.5 h21 c1.5 0 2.5 1 2.5 2.5 v8 c0 4.5 -3.5 8 -8 8 h-10 c-4.5 0 -8 -3.5 -8 -8 z"/>
+      <rect x="4"    y="4"   width="4.6" height="13" rx="2.3"/>
+      <rect x="9.7"  y="1"   width="4.6" height="16" rx="2.3"/>
+      <rect x="15.4" y="0"   width="4.6" height="17" rx="2.3"/>
+      <rect x="21.1" y="2.5" width="4.6" height="14.5" rx="2.3"/>
+    </g>
   </g>
 </svg>

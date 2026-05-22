@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <!-- Direct adaptation of StopOn.svg's layered button skin so the
-       raised look + top highlight matches the other six categories
-       pixel-for-pixel. Red palette swapped for teal:
-         #AD1E1E -> #0097A7  (dark teal outline)
-         #EA2424 -> #00BCD4  (bright teal fill)
-       The central P-letter glyph is replaced with a hand silhouette
-       (palm + 4 fingers + thumb), matching the reference image. -->
+  <!-- Direct copy of StopOn.svg's layer stack — every gradient + frame
+       path is byte-identical so the panel sits at the same y as the
+       other "selected" category buttons. Only the colour stops change
+       (red -> teal) and the central P-letter glyph is replaced with a
+       hand silhouette. The hand is placed in the centre of the inner
+       frame (EA2424 path) so its position naturally shifts up/down in
+       lockstep with the panel between On and Off, matching StopOn/Off.-->
   <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.556" y1="-594.661" x2="25.556" y2="-561.828" gradientTransform="matrix(1 0 0 -1 0 -540.074)">
     <stop offset="0" stop-color="#fff"/>
     <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
@@ -20,22 +20,29 @@
   <path opacity=".75" fill="url(#b)" d="M10.556 54.67c-4.411 0-8-3.59-8-8v-30c0-4.411 3.589-8 8-8h30c4.41 0 8 3.589 8 8v30c0 4.41-3.59 8-8 8h-30z"/>
   <path fill="#0097A7" d="M48.057 46.67c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
   <path fill="#00BCD4" d="M40.557 9.67h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7z"/>
-  <!-- Hand glyph: subtle dark drop-shadow first, then white fill on top -->
-  <g fill="#0097A7">
-    <rect x="14" y="25" width="22" height="20" rx="6"/>
-    <rect x="15.5" y="14" width="4.5" height="14" rx="2.2"/>
-    <rect x="21"   y="11" width="4.5" height="17" rx="2.2"/>
-    <rect x="26.5" y="13" width="4.5" height="15" rx="2.2"/>
-    <rect x="32"   y="16" width="4.5" height="12" rx="2.2"/>
-    <path d="M13 28c-1.8 0 -3.4 1.3 -3.4 3.2 0 1.8 1.5 3.3 3.4 3.3 1.8 0 3.4 -1.4 3.4 -3.2 v-2.5 c0 -.5 -.4 -.8 -.9 -.8 z"/>
-  </g>
-  <g fill="#FFFFFF" transform="translate(0 -.5)">
-    <rect x="14" y="25" width="22" height="20" rx="6"/>
-    <rect x="15.5" y="14" width="4.5" height="14" rx="2.2"/>
-    <rect x="21"   y="11" width="4.5" height="17" rx="2.2"/>
-    <rect x="26.5" y="13" width="4.5" height="15" rx="2.2"/>
-    <rect x="32"   y="16" width="4.5" height="12" rx="2.2"/>
-    <path d="M13 28c-1.8 0 -3.4 1.3 -3.4 3.2 0 1.8 1.5 3.3 3.4 3.3 1.8 0 3.4 -1.4 3.4 -3.2 v-2.5 c0 -.5 -.4 -.8 -.9 -.8 z"/>
+  <!-- Hand glyph centred on the inner-frame (y ~9.67-46.67). Shadow
+       layer first (#0097A7), then the white hand on top, slightly
+       higher to suggest depth. The whole group lives inside the
+       inner frame so it shares its On/Off vertical shift. -->
+  <g transform="translate(10.5 17)">
+    <!-- shadow -->
+    <g fill="#0097A7">
+      <!-- palm: rounded rect bottom-half -->
+      <path d="M2 16 c0 -1.5 1 -2.5 2.5 -2.5 h21 c1.5 0 2.5 1 2.5 2.5 v8 c0 4.5 -3.5 8 -8 8 h-10 c-4.5 0 -8 -3.5 -8 -8 z"/>
+      <!-- four fingers (left to right, with slight length variance) -->
+      <rect x="4"    y="4"   width="4.6" height="13" rx="2.3"/>
+      <rect x="9.7"  y="1"   width="4.6" height="16" rx="2.3"/>
+      <rect x="15.4" y="0"   width="4.6" height="17" rx="2.3"/>
+      <rect x="21.1" y="2.5" width="4.6" height="14.5" rx="2.3"/>
+    </g>
+    <!-- white fill (sits 0.6px higher than the shadow) -->
+    <g fill="#FFFFFF" transform="translate(0 -.6)">
+      <path d="M2 16 c0 -1.5 1 -2.5 2.5 -2.5 h21 c1.5 0 2.5 1 2.5 2.5 v8 c0 4.5 -3.5 8 -8 8 h-10 c-4.5 0 -8 -3.5 -8 -8 z"/>
+      <rect x="4"    y="4"   width="4.6" height="13" rx="2.3"/>
+      <rect x="9.7"  y="1"   width="4.6" height="16" rx="2.3"/>
+      <rect x="15.4" y="0"   width="4.6" height="17" rx="2.3"/>
+      <rect x="21.1" y="2.5" width="4.6" height="14.5" rx="2.3"/>
+    </g>
   </g>
   <path fill-opacity=".17" d="M40.466 9.67h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7zm5.5 37c0 3.033-2.467 5.5-5.5 5.5h-30a5.506 5.506 0 0 1-5.5-5.5v-30c0-3.033 2.467-5.5 5.5-5.5h30c3.033 0 5.5 2.467 5.5 5.5v30z"/>
 </svg>
