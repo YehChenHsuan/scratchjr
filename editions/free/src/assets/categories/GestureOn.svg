@@ -1,33 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <!-- On state: bright teal panel with top highlight; chunky 5-finger
-       hand glyph matches the reference image (rounded palm + four
-       fingers + thumb on the left side). -->
-  <linearGradient id="ga" gradientUnits="userSpaceOnUse" x1="25.5" y1="2" x2="25.5" y2="55">
+  <!-- Direct adaptation of StopOn.svg's layered button skin so the
+       raised look + top highlight matches the other six categories
+       pixel-for-pixel. Red palette swapped for teal:
+         #AD1E1E -> #0097A7  (dark teal outline)
+         #EA2424 -> #00BCD4  (bright teal fill)
+       The central P-letter glyph is replaced with a hand silhouette
+       (palm + 4 fingers + thumb), matching the reference image. -->
+  <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.556" y1="-594.661" x2="25.556" y2="-561.828" gradientTransform="matrix(1 0 0 -1 0 -540.074)">
     <stop offset="0" stop-color="#fff"/>
     <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
     <stop offset="1" stop-color="#fff" stop-opacity="0"/>
   </linearGradient>
-  <path opacity=".75" fill="url(#ga)" d="M10.556 54.5c-4.411 0-8-3.589-8-8v-30c0-4.411 3.589-8 8-8h30c4.411 0 8 3.589 8 8v30c0 4.411-3.589 8-8 8h-30z"/>
-  <path fill="#0097A7" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
-  <path fill="#00BCD4" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
-  <!-- Hand: palm + 4 fingers + thumb. Designed as separate rounded
-       rectangles fused with the palm so the silhouette stays crisp at
-       this small size. -->
-  <g fill="#FFFFFF">
-    <!-- Palm (rounded rectangle) -->
+  <path opacity=".75" fill="url(#a)" d="M10.556 54.67c-4.411 0-8-3.59-8-8v-30c0-4.411 3.589-8 8-8h30c4.41 0 8 3.589 8 8v30c0 4.41-3.59 8-8 8h-30z"/>
+  <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="25.556" y1="-594.661" x2="25.556" y2="-561.828" gradientTransform="matrix(1 0 0 -1 0 -540.074)">
+    <stop offset="0" stop-color="#fff"/>
+    <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
+    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <path opacity=".75" fill="url(#b)" d="M10.556 54.67c-4.411 0-8-3.59-8-8v-30c0-4.411 3.589-8 8-8h30c4.41 0 8 3.589 8 8v30c0 4.41-3.59 8-8 8h-30z"/>
+  <path fill="#0097A7" d="M48.057 46.67c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <path fill="#00BCD4" d="M40.557 9.67h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7z"/>
+  <!-- Hand glyph: subtle dark drop-shadow first, then white fill on top -->
+  <g fill="#0097A7">
     <rect x="14" y="25" width="22" height="20" rx="6"/>
-    <!-- Four fingers (left to right) -->
     <rect x="15.5" y="14" width="4.5" height="14" rx="2.2"/>
     <rect x="21"   y="11" width="4.5" height="17" rx="2.2"/>
     <rect x="26.5" y="13" width="4.5" height="15" rx="2.2"/>
     <rect x="32"   y="16" width="4.5" height="12" rx="2.2"/>
-    <!-- Thumb sticking out to the lower-left -->
-    <path d="M13 28
-             c-1.8 0 -3.4 1.3 -3.4 3.2
-             0  1.8 1.5 3.3 3.4 3.3
-             1.8 0 3.4 -1.4 3.4 -3.2
-             v-2.5
-             c0 -.5 -.4 -.8 -.9 -.8 z"/>
+    <path d="M13 28c-1.8 0 -3.4 1.3 -3.4 3.2 0 1.8 1.5 3.3 3.4 3.3 1.8 0 3.4 -1.4 3.4 -3.2 v-2.5 c0 -.5 -.4 -.8 -.9 -.8 z"/>
   </g>
-  <path fill-opacity=".17" d="M40.564 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.861 0 7-3.141 7-7v-30c0-3.86-3.137-7-7-7zm5.5 37c0 3.033-2.467 5.5-5.5 5.5h-30a5.506 5.506 0 0 1-5.5-5.5v-30c0-3.033 2.467-5.5 5.5-5.5h30c3.033 0 5.5 2.467 5.5 5.5v30z"/>
+  <g fill="#FFFFFF" transform="translate(0 -.5)">
+    <rect x="14" y="25" width="22" height="20" rx="6"/>
+    <rect x="15.5" y="14" width="4.5" height="14" rx="2.2"/>
+    <rect x="21"   y="11" width="4.5" height="17" rx="2.2"/>
+    <rect x="26.5" y="13" width="4.5" height="15" rx="2.2"/>
+    <rect x="32"   y="16" width="4.5" height="12" rx="2.2"/>
+    <path d="M13 28c-1.8 0 -3.4 1.3 -3.4 3.2 0 1.8 1.5 3.3 3.4 3.3 1.8 0 3.4 -1.4 3.4 -3.2 v-2.5 c0 -.5 -.4 -.8 -.9 -.8 z"/>
+  </g>
+  <path fill-opacity=".17" d="M40.466 9.67h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7zm5.5 37c0 3.033-2.467 5.5-5.5 5.5h-30a5.506 5.506 0 0 1-5.5-5.5v-30c0-3.033 2.467-5.5 5.5-5.5h30c3.033 0 5.5 2.467 5.5 5.5v30z"/>
 </svg>

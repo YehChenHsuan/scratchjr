@@ -1,13 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <linearGradient id="goa" gradientUnits="userSpaceOnUse" x1="25.5" y1="55" x2="25.5" y2="2">
-    <stop offset="0" stop-opacity="0"/>
-    <stop offset=".91" stop-opacity=".45"/>
-    <stop offset="1" stop-opacity=".5"/>
+  <!-- Built directly on top of StopOff.svg's layer structure so the
+       button still looks raised with a subtle highlight at the top —
+       the only differences are colour (red -> teal) and the central
+       glyph (P letter -> hand). Keep all the gradients and the khaki
+       press-baseplate (#C9BF8B) intact. -->
+  <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.445" y1="1761.074" x2="25.445" y2="1716.074" gradientTransform="translate(0 -1706.074)">
+    <stop offset="0" stop-opacity=".5"/>
+    <stop offset=".09" stop-opacity=".455"/>
+    <stop offset="1" stop-opacity="0"/>
   </linearGradient>
-  <path fill="#7BB5BD" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
-  <path fill="#B5E2E8" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
-  <path opacity=".6" fill="url(#goa)" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
-  <g fill="#FFFFFF" opacity=".75">
+  <path opacity=".5" fill="url(#a)" d="M47.945 47.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <path fill="#C9BF8B" d="M47.945 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="25.445" y1="1762.672" x2="25.445" y2="1718.102" gradientTransform="translate(0 -1706.074)">
+    <stop offset="0" stop-opacity=".5"/>
+    <stop offset=".09" stop-opacity=".455"/>
+    <stop offset="1" stop-opacity="0"/>
+  </linearGradient>
+  <path opacity=".5" fill="url(#b)" d="M47.945 48.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <path fill="#0097A7" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <path fill="#0097A7" d="M10.556 53.5c-3.858 0-7-3.141-7-7v-30c0-3.86 3.142-7 7-7h30c3.856 0 7 3.14 7 7v30c0 3.859-3.144 7-7 7h-30z"/>
+  <path fill="#0097A7" d="M48.057 36.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-28c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v28z"/>
+  <path fill="#4DD0E1" d="M40.557 1.5h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7zm6.5 37c0 3.584-2.916 6.5-6.5 6.5h-30a6.508 6.508 0 0 1-6.5-6.5v-30c0-3.584 2.916-6.5 6.5-6.5h30c3.584 0 6.5 2.916 6.5 6.5v30z"/>
+  <path opacity=".3" fill="#FFF" d="M40.557 1.5h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7zm6.5 37c0 3.584-2.916 6.5-6.5 6.5h-30a6.508 6.508 0 0 1-6.5-6.5v-30c0-3.584 2.916-6.5 6.5-6.5h30c3.584 0 6.5 2.916 6.5 6.5v30z"/>
+  <path fill="#F7EC9F" d="M40.557 2h-30a6.508 6.508 0 0 0-6.5 6.5v30c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5z"/>
+  <path fill="#00BCD4" d="M40.557 2h-30a6.508 6.508 0 0 0-6.5 6.5v30c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5z"/>
+  <linearGradient id="c" gradientUnits="userSpaceOnUse" x1="25.556" y1="1663.575" x2="25.556" y2="1695.873" gradientTransform="translate(0 -1662)">
+    <stop offset="0" stop-color="#fff" stop-opacity=".5"/>
+    <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <path fill="url(#c)" d="M4.056 38.5c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5h-30a6.508 6.508 0 0 0-6.5 6.5v30z"/>
+  <!-- Hand glyph (palm + 4 fingers + thumb) replacing the StopOff "P" -->
+  <g fill="#FFFFFF">
     <rect x="14" y="25" width="22" height="20" rx="6"/>
     <rect x="15.5" y="14" width="4.5" height="14" rx="2.2"/>
     <rect x="21"   y="11" width="4.5" height="17" rx="2.2"/>
@@ -20,5 +44,4 @@
              v-2.5
              c0 -.5 -.4 -.8 -.9 -.8 z"/>
   </g>
-  <path fill-opacity=".17" d="M40.564 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.861 0 7-3.141 7-7v-30c0-3.86-3.137-7-7-7zm5.5 37c0 3.033-2.467 5.5-5.5 5.5h-30a5.506 5.506 0 0 1-5.5-5.5v-30c0-3.033 2.467-5.5 5.5-5.5h30c3.033 0 5.5 2.467 5.5 5.5v30z"/>
 </svg>
