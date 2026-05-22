@@ -21,12 +21,18 @@ export default class GestureTrainer {
     }
 
     async init () {
-        // Reuse the engine's lazy CDN loader.
+        // engine.startCameraOnly loads tf/mobilenet/knnClassifier from CDN
+        // AND already calls `mobilenet.load()` to produce a usable model
+        // instance. Reuse that instance (it has .infer()) — the global
+        // `window.mobilenet` is only the namespace and has no infer fn.
         await this.engine.startCameraOnly(document.getElementById('gesture-trainer-video'));
-        // Pull tf libs from window after engine load.
         this.tf = window.tf;
-        this.mobilenet = window.mobilenet;
         this.knnClassifier = window.knnClassifier;
+        this.mobilenet = this.engine.mobilenetModel;  // loaded model
+        if (!this.mobilenet && window.mobilenet && window.mobilenet.load) {
+            this.mobilenet = await window.mobilenet.load();
+            this.engine.mobilenetModel = this.mobilenet;
+        }
         this.knn = this.knnClassifier.create();
 
         // Restore previous samples if any.

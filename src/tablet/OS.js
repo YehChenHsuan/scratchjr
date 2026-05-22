@@ -272,6 +272,32 @@ export default class OS {
         tabletInterface.setAnalyticsPref(key, value);
     }
 
+    // ---- AI Gesture model persistence (web-only) -------------------------
+    // Native bridges don't implement these; the calls fall through to a
+    // no-op when running inside a WebView. On web they hit Web.js which
+    // stores models in the IndexedDB `gestures` store.
+    static gesture_save (projectId, payload, fcn) {
+        if (tabletInterface && tabletInterface.gesture_save) {
+            tabletInterface.gesture_save(projectId, payload, fcn);
+        } else if (fcn) {
+            fcn('');
+        }
+    }
+    static gesture_load (projectId, fcn) {
+        if (tabletInterface && tabletInterface.gesture_load) {
+            tabletInterface.gesture_load(projectId, fcn);
+        } else if (fcn) {
+            fcn('');
+        }
+    }
+    static gesture_metadata (projectId, fcn) {
+        if (tabletInterface && tabletInterface.gesture_metadata) {
+            tabletInterface.gesture_metadata(projectId, fcn);
+        } else if (fcn) {
+            fcn('[]');
+        }
+    }
+
     // Web Wiew delegate call backs
 
     static pageError (desc) {

@@ -72,7 +72,10 @@ export function aiTrainerMain () {
 
     document.getElementById('ait-back').onmousedown = () => {
         if (trainer) trainer.dispose();
-        window.location.href = 'editor.html';
+        const back = projectId && projectId !== 'default'
+            ? 'editor.html?pmd5=' + encodeURIComponent(projectId) + '&mode=edit'
+            : 'editor.html';
+        window.location.href = back;
     };
 
     document.getElementById('ait-collect').onmousedown = () => {
@@ -99,7 +102,12 @@ export function aiTrainerMain () {
         const saved = await trainer.saveModel();
         if (saved.length === 0) { alert('每個手勢至少需要 ' + MIN_SAMPLES + ' 個樣本'); return; }
         status.textContent = '已儲存 ' + saved.length + ' 個手勢';
-        setTimeout(() => { window.location.href = 'editor.html'; }, 1500);
+        // Return to the editor with the project ID preserved so the editor
+        // reopens the project the user was working on.
+        const back = projectId && projectId !== 'default'
+            ? 'editor.html?pmd5=' + encodeURIComponent(projectId) + '&mode=edit'
+            : 'editor.html';
+        setTimeout(() => { window.location.href = back; }, 1500);
     };
 
     (async () => {
