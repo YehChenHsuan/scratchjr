@@ -1,13 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <linearGradient id="goa" gradientUnits="userSpaceOnUse" x1="25.5" y1="2" x2="25.5" y2="55">
-    <stop offset="0" stop-color="#fff"/>
-    <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
-    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  <!-- Off state: muted version of the same hue + inset shadow at the top,
+       matching StartOff / SoundOff / FlowOff visual language. -->
+  <linearGradient id="goa" gradientUnits="userSpaceOnUse" x1="25.5" y1="55" x2="25.5" y2="2">
+    <stop offset="0" stop-opacity="0"/>
+    <stop offset=".91" stop-opacity=".45"/>
+    <stop offset="1" stop-opacity=".5"/>
   </linearGradient>
-  <path opacity=".5" fill="url(#goa)" d="M10.556 54.5c-4.411 0-8-3.589-8-8v-30c0-4.411 3.589-8 8-8h30c4.411 0 8 3.589 8 8v30c0 4.411-3.589 8-8 8h-30z"/>
-  <path fill="#6F7C7E" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
-  <path fill="#8A9598" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
-  <g fill="#FFFFFF" opacity=".82" transform="translate(13 17)">
+  <path fill="#7BB5BD" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
+  <path fill="#B5E2E8" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
+  <path opacity=".6" fill="url(#goa)" d="M40.557 9.5h-30c-3.86 0-7 3.14-7 7v30c0 3.859 3.14 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7z"/>
+  <g fill="#FFFFFF" opacity=".7" transform="translate(13 17)">
     <rect x="4" y="9" width="3" height="13" rx="1.2"/>
     <rect x="8.5" y="3" width="3" height="19" rx="1.2"/>
     <rect x="13" y="1.5" width="3" height="20.5" rx="1.2"/>
