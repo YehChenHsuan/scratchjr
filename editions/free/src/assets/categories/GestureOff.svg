@@ -1,9 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
-  <!-- Direct copy of StopOff.svg's full layer stack (the khaki press
-       baseplate at y=1.5, the inner frame at y=2 so it sits 7.67px
-       higher than the On state, the white-highlight outline and the
-       inset gradient).  Red colours -> teal, and the central glyph
-       is moved up to match the inner frame's shifted Y. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="51" height="57" viewBox="0 0 51 57">
+  <!-- StopOff.svg's layer stack (inner frame raised to y=2..45),
+       recoloured red -> teal. White hand glyph from _hand-glyph.svg,
+       shifted up by ~7.67 so it tracks the raised panel. -->
   <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.445" y1="1761.074" x2="25.445" y2="1716.074" gradientTransform="translate(0 -1706.074)">
     <stop offset="0" stop-opacity=".5"/>
     <stop offset=".09" stop-opacity=".455"/>
@@ -30,16 +28,6 @@
     <stop offset="1" stop-color="#fff" stop-opacity="0"/>
   </linearGradient>
   <path fill="url(#c)" d="M4.056 38.5c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5h-30a6.508 6.508 0 0 0-6.5 6.5v30z"/>
-  <!-- Hand glyph — same path as GestureOn but shifted up by 7.67 so it
-       stays centred on the Off panel (which itself sits 7.67 above the
-       On panel). -->
-  <g transform="translate(10.5 9.33)" opacity=".9">
-    <g fill="#FFFFFF">
-      <path d="M2 16 c0 -1.5 1 -2.5 2.5 -2.5 h21 c1.5 0 2.5 1 2.5 2.5 v8 c0 4.5 -3.5 8 -8 8 h-10 c-4.5 0 -8 -3.5 -8 -8 z"/>
-      <rect x="4"    y="4"   width="4.6" height="13" rx="2.3"/>
-      <rect x="9.7"  y="1"   width="4.6" height="16" rx="2.3"/>
-      <rect x="15.4" y="0"   width="4.6" height="17" rx="2.3"/>
-      <rect x="21.1" y="2.5" width="4.6" height="14.5" rx="2.3"/>
-    </g>
-  </g>
+  <!-- White hand glyph, shifted up by 7.67 to track the raised Off panel -->
+  <image x="13" y="6.33" width="24" height="35.5" preserveAspectRatio="xMidYMid meet" opacity=".95" xlink:href="_hand-glyph.svg"/>
 </svg>

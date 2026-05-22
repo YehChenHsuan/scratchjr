@@ -184,13 +184,14 @@ export default class Camera {
         if (!target) {
             return;
         }
-        if (str != 'error getting a still') {
+        const isError = !str || str === 'error getting a still';
+        if (!isError) {
             SVGImage.addCameraFill(target, str);
         }
         Camera.close();
         Paint.cameraToolsOff();
         Paint.selectButton('select');
-        if (str != 'error getting a still') {
+        if (!isError) {
             PaintUndo.record();
             Ghost.drawOffscreen();
         }

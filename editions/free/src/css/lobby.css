@@ -62,17 +62,20 @@ div.frame {
 }
 
 #topbar ul.topbar-nav li.logo {
-    width: ${css_vh(32)};
+    width: ${css_vh(40)};
 }
 
 #topbar ul.topbar-nav .logo .logo-icon {
     display: block;
-    width: ${css_vh(28.65)};
+    width: ${css_vh(38)};
     height: ${css_vh(10.03)};
-    background: url('../assets/lobby/scratchJrlogo.svg');
-    background-size: 101%;
+    background: url('../assets/lobby/meowlogo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     padding: 0;
     margin: auto auto;
+    cursor: pointer;
 }
 
 #topbar ul.topbar-nav li.home {

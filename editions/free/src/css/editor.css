@@ -260,6 +260,23 @@ div.frame {
     overflow: hidden;
 }
 
+#blockspalette .gesturetrainerbutton {
+    width: ${78 * scaleMultiplier}px;
+    height: ${50 * scaleMultiplier}px;
+    line-height: ${50 * scaleMultiplier}px;
+    text-align: center;
+    font-family: Verdana, sans-serif;
+    font-size: ${12 * scaleMultiplier}px;
+    font-weight: bold;
+    color: #0a5a64;
+    background: #fff7ce;
+    border: ${3 * scaleMultiplier}px solid #13b9c8;
+    border-radius: ${8 * scaleMultiplier}px;
+    box-shadow: inset 0px ${-4 * scaleMultiplier}px 0px rgba(0,0,0,.12);
+    cursor: pointer;
+    user-select: none;
+}
+
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
 #blockspalette .blue { background: #4B8CC2;}
 #blockspalette .pink { background: #CD7CD1;}

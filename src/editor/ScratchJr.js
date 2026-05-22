@@ -16,6 +16,7 @@ import ScriptsPane from './ui/ScriptsPane';
 import Events from '../utils/Events';
 import BlockSpecs from './blocks/BlockSpecs';
 import Runtime from './engine/Runtime';
+import GestureEngine from '../gesture/GestureEngine';
 import Localization from '../utils/Localization';
 import {libInit, gn, scaleMultiplier, newHTML,
     isAndroid, getUrlVars, CSSTransition3D, frame} from '../utils/lib';
@@ -29,6 +30,8 @@ let changed = false;
 // to save a normal user project.
 let storyStarted = false;
 let runtime = undefined;
+let gestureEngine = undefined;
+let gestureVideo = undefined;
 let stage = undefined;
 let inFullscreen = false;
 let keypad = undefined;
@@ -448,6 +451,7 @@ export default class ScratchJr {
     static startGreenFlagThreads () {
         ScratchJr.resetSprites();
         ScratchJr.startCurrentPageStrips(['onflag', 'ontouch']);
+        ScratchJr.startGestureCamera();
     }
 
     static startCurrentPageStrips (list) {
@@ -483,7 +487,53 @@ export default class ScratchJr {
 
     static stopStrips () {
         runtime.stopThreads();
+        ScratchJr.stopGestureCamera();
         stage.currentPage.updateThumb();
+    }
+
+    static startGestureCamera () {
+        if (!currentProject) {
+            return;
+        }
+        if (!gestureVideo) {
+            gestureVideo = document.createElement('video');
+            gestureVideo.setAttribute('playsinline', 'playsinline');
+            gestureVideo.muted = true;
+            gestureVideo.style.display = 'none';
+            document.body.appendChild(gestureVideo);
+        }
+        if (!gestureEngine) {
+            gestureEngine = new GestureEngine();
+            gestureEngine.onGestureDetected((gestureId) => {
+                ScratchJr.startScriptsForGesture(gestureId);
+            });
+        }
+        gestureEngine.start(currentProject, gestureVideo).catch(e => {
+            console.warn('[GestureEngine] start failed', e);
+        });
+    }
+
+    static stopGestureCamera () {
+        if (gestureEngine) {
+            gestureEngine.stop();
+        }
+    }
+
+    static startScriptsForGesture (gestureId) {
+        var page = stage.currentPage.div;
+        for (var i = 0; i < page.childElementCount; i++) {
+            var spr = page.childNodes[i].owner;
+            if (!spr || !gn(spr.id + '_scripts')) {
+                continue;
+            }
+            var sc = gn(spr.id + '_scripts');
+            var topblocks = sc.owner.getBlocksType(['ongesture']);
+            for (var j = 0; j < topblocks.length; j++) {
+                if (topblocks[j].getArgValue() == gestureId) {
+                    runtime.addRunScript(spr, topblocks[j]);
+                }
+            }
+        }
     }
 
     static resetSprites () {

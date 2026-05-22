@@ -393,20 +393,48 @@ export default class Web {
         }).catch(() => cb(fcn, '0'));
     }
     static captureimage (fcn) {
-        if (!videoEl || !videoEl.videoWidth) {
-            Web._invokeCallback(fcn, '');
+        if (!videoEl) {
+            Web._invokeCallback(fcn, 'error getting a still');
             return;
         }
+        // If video hasn't decoded a frame yet, wait up to 2s for it.
+        if (!videoEl.videoWidth) {
+            let waited = 0;
+            const poll = setInterval(() => {
+                waited += 50;
+                if (videoEl && videoEl.videoWidth) {
+                    clearInterval(poll);
+                    Web._doCapture(fcn);
+                } else if (waited >= 2000 || !videoEl) {
+                    clearInterval(poll);
+                    Web._invokeCallback(fcn, 'error getting a still');
+                }
+            }, 50);
+            return;
+        }
+        // IMPORTANT: snapshot synchronously *before* the caller hides the
+        // backdrop (Paint.cameraToolsOff). Once the backdrop turns
+        // display:none, drawImage of the contained <video> can return an
+        // empty frame in some browsers, so we grab the pixels first and
+        // hand the result back via _invokeCallback's normal scheduling.
         // The preview covers the whole maincanvas; the target shape's
         // bounding box in workspace coordinates was stashed on the video
         // element. Crop the captured frame to that box so the photo fed to
         // SVGImage.addCameraFill matches what the user saw "inside" the
         // mask hole — otherwise the image is scaled to fill the shape's
         // viewbox and the subject appears shifted.
-        const tx = Number(videoEl.dataset.targetX) || 0;
-        const ty = Number(videoEl.dataset.targetY) || 0;
-        const tw = Number(videoEl.dataset.targetW) || 0;
-        const th = Number(videoEl.dataset.targetH) || 0;
+        Web._doCapture(fcn);
+    }
+
+    static _doCapture (fcn) {
+        if (!videoEl || !videoEl.videoWidth) {
+            Web._invokeCallback(fcn, 'error getting a still');
+            return;
+        }
+        const targetX = Number(videoEl.dataset.targetX) || 0;
+        const targetY = Number(videoEl.dataset.targetY) || 0;
+        const targetW = Number(videoEl.dataset.targetW) || 0;
+        const targetH = Number(videoEl.dataset.targetH) || 0;
         const wsW = Number(videoEl.dataset.workspaceW) || videoEl.videoWidth;
         const wsH = Number(videoEl.dataset.workspaceH) || videoEl.videoHeight;
 
@@ -414,28 +442,27 @@ export default class Web {
         // object-fit:cover scaling — video frame is centered + cropped to
         // fill the preview rect. Match that math when picking source rect.
         const scale = Math.max(vw / wsW, vh / wsH);
-        const coverW = vw / scale, coverH = vh / scale;  // visible region in workspace px
+        const coverW = vw / scale, coverH = vh / scale;
         const offX = (wsW - coverW) / 2;
         const offY = (wsH - coverH) / 2;
 
         // Map target rect from workspace coords -> video frame coords.
-        let sx = (tx - offX) * scale;
-        let sy = (ty - offY) * scale;
-        let sw = tw * scale;
-        let sh = th * scale;
+        let sx = (targetX - offX) * scale;
+        let sy = (targetY - offY) * scale;
+        let sw = targetW * scale;
+        let sh = targetH * scale;
         if (!sw || !sh) { sx = 0; sy = 0; sw = vw; sh = vh; }
 
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(sw));
         canvas.height = Math.max(1, Math.round(sh));
         const ctx = canvas.getContext('2d');
-        // Match the mirrored preview so the saved photo looks like what
-        // the user just framed up.
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(videoEl, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL('image/png');
         const b64 = dataUrl.split(',')[1] || '';
+        console.log('[Web.captureimage]', {videoW: vw, videoH: vh, src: {sx, sy, sw, sh}, b64len: b64.length});
         Web._invokeCallback(fcn, b64);
     }
 

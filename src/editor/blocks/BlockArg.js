@@ -2,6 +2,7 @@ import ScratchJr from '../ScratchJr';
 import BlockSpecs from './BlockSpecs';
 import Menu from './Menu';
 import Undo from '../ui/Undo';
+import {gestureIconName} from '../../gesture/GestureDefs';
 import {setCanvasSize, setProps, writeText, scaleMultiplier,
     newHTML, newDiv, newCanvas, getStringSize, isTablet,
     newP, globalx, globaly} from '../../utils/lib';
@@ -16,6 +17,7 @@ m: regular menu with icons
 s: text for soundblock
 r: number for recorded sound block
 p: page icons
+g: AI gesture command
 
 */
 export default class BlockArg {
@@ -48,6 +50,11 @@ export default class BlockArg {
             this.numperrow = 3;
             this.icon = BlockSpecs.speeds[this.argValue];
             this.div = this.addImageMenu(this.menuCloseSpeeds);
+            break;
+        case 'g':
+            this.argValue = block.spec[4];
+            this.icon = gestureIconName(this.argValue);
+            this.div = this.addGestureIcon();
             break;
         case 'p':
             this.argValue = block.spec[4];
@@ -243,6 +250,11 @@ export default class BlockArg {
             this.button.parentNode.height += this.button.height / 2;
             setCanvasSize(this.button.parentNode, this.button.parentNode.width, this.button.parentNode.height);
         }
+        return this.daddy.blockicon;
+    }
+
+    addGestureIcon () {
+        this.drawChoice(this.daddy.blockicon);
         return this.daddy.blockicon;
     }
 

@@ -1,5 +1,6 @@
 import Localization from '../../utils/Localization';
 import IO from '../../tablet/IO';
+import {GESTURE_DEFS, gestureIconName, gestureShortLabel} from '../../gesture/GestureDefs';
 
 let loadCount = 0;
 
@@ -186,7 +187,7 @@ export default class BlockSpecs {
             [],
             ['wait', 'stopmine', 'setspeed', 'repeat'],
             ['endstack', 'forever'],
-            ['ongesture']];
+            []];
     }
 
     ///////////////////////////////
@@ -334,7 +335,16 @@ export default class BlockSpecs {
             }),
             'message': Localization.localize('BLOCK_DESC_SEND_MESSAGE', {
                 COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
-            })
+            }),
+            'ongesture': 'AI gesture: ' + gestureShortLabel(str)
         };
+    }
+
+    static getGestureSpec (gestureId) {
+        var def = GESTURE_DEFS.find(g => g.id == gestureId);
+        var spec = BlockSpecs.defs.ongesture.concat();
+        spec[1] = BlockSpecs.getImageFrom('assets/blockicons/' + gestureIconName(gestureId), 'svg');
+        spec[4] = def ? def.id : 'gesture_1_up';
+        return spec;
     }
 }

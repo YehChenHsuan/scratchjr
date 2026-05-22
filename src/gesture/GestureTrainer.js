@@ -3,10 +3,12 @@
 
 import GestureEngine from './GestureEngine';
 import GestureStorage from './GestureStorage';
+import {GESTURE_DEFS} from './GestureDefs';
 
 export const MIN_SAMPLES = 20;
 export const MAX_SAMPLES = 50;
 const SAMPLE_INTERVAL_MS = 500;
+const VALID_GESTURE_IDS = GESTURE_DEFS.map(def => def.id);
 
 export default class GestureTrainer {
     constructor (projectId) {
@@ -38,14 +40,20 @@ export default class GestureTrainer {
         // Restore previous samples if any.
         const stored = await GestureStorage.load(this.projectId, this.tf);
         if (stored) {
-            this.knn.setClassifierDataset(stored.tensors);
+            const filtered = {};
             for (const label of Object.keys(stored.tensors)) {
-                this.sampleCounts[label] = stored.tensors[label].shape[0];
+                if (VALID_GESTURE_IDS.indexOf(label) > -1) {
+                    filtered[label] = stored.tensors[label];
+                    this.sampleCounts[label] = stored.tensors[label].shape[0];
+                }
             }
+            this.knn.setClassifierDataset(filtered);
         }
     }
 
-    getSampleCount (gestureId) { return this.sampleCounts[gestureId] || 0; }
+    getSampleCount (gestureId) {
+        return this.sampleCounts[gestureId] || 0;
+    }
 
     startCollecting (gestureId, videoEl, onTick) {
         this.stopCollecting();
@@ -53,7 +61,9 @@ export default class GestureTrainer {
         this.collectingTimer = setInterval(async () => {
             if ((this.sampleCounts[gestureId] || 0) >= target) {
                 this.stopCollecting();
-                if (onTick) onTick(this.sampleCounts[gestureId], target, true);
+                if (onTick) {
+                    onTick(this.sampleCounts[gestureId], target, true);
+                }
                 return;
             }
             const act = this.mobilenet ? this.mobilenet.infer(videoEl, 'conv_preds') : null;
@@ -61,13 +71,17 @@ export default class GestureTrainer {
                 this.knn.addExample(act, gestureId);
                 act.dispose();
                 this.sampleCounts[gestureId] = (this.sampleCounts[gestureId] || 0) + 1;
-                if (onTick) onTick(this.sampleCounts[gestureId], target, false);
+                if (onTick) {
+                    onTick(this.sampleCounts[gestureId], target, false);
+                }
             }
         }, SAMPLE_INTERVAL_MS);
     }
 
     stopCollecting () {
-        if (this.collectingTimer) clearInterval(this.collectingTimer);
+        if (this.collectingTimer) {
+            clearInterval(this.collectingTimer);
+        }
         this.collectingTimer = null;
     }
 
@@ -84,7 +98,10 @@ export default class GestureTrainer {
         const dataset = this.knn.getClassifierDataset();
         const filtered = {};
         for (const label of Object.keys(dataset)) {
-            if ((this.sampleCounts[label] || 0) >= MIN_SAMPLES) filtered[label] = dataset[label];
+            if ((VALID_GESTURE_IDS.indexOf(label) > -1) &&
+                    ((this.sampleCounts[label] || 0) >= MIN_SAMPLES)) {
+                filtered[label] = dataset[label];
+            }
         }
         const tmp = this.knnClassifier.create();
         tmp.setClassifierDataset(filtered);

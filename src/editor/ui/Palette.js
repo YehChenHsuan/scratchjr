@@ -8,6 +8,8 @@ import BlockSpecs from '../blocks/BlockSpecs';
 import ScriptsPane from './ScriptsPane';
 import Undo from './Undo';
 import OS from '../../tablet/OS';
+import GestureStorage from '../../gesture/GestureStorage';
+import {GESTURE_DEFS} from '../../gesture/GestureDefs';
 import MediaLib from '../../tablet/MediaLib';
 import Events from '../../utils/Events';
 import Rectangle from '../../geom/Rectangle';
@@ -88,6 +90,9 @@ export default class Palette {
         for (var i = 0; i < pal.childElementCount; i++) {
             var ths = pal.childNodes[i];
             if (!hitRect(ths, pt)) {
+                continue;
+            }
+            if (!ths.owner) {
                 continue;
             }
             if (ScratchJr.shaking && (ScratchJr.shaking == ths)) {
@@ -379,6 +384,9 @@ export default class Palette {
             }
         }
         dx += 30;
+        if (n == (BlockSpecs.categories.length - 1)) {
+            Palette.addGestureBlocks(dxblocks);
+        }
         if ((n == (BlockSpecs.categories.length - 1)) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
@@ -420,6 +428,48 @@ export default class Palette {
             newb.lift();
             dx += betweenblocks + 5;
         }
+    }
+
+    static addGestureBlocks (dx) {
+        var pal = gn('palette');
+        var projectId = ScratchJr.currentProject || 'default';
+        Palette.addGestureTrainerButton(pal, dx);
+        dx += betweenblocks + 10;
+        GestureStorage.getTrainedGestures(projectId).then(gestures => {
+            if (numcat != (BlockSpecs.categories.length - 1)) {
+                return;
+            }
+            var trained = GESTURE_DEFS
+                .map(def => def.id)
+                .filter(id => gestures.indexOf(id) > -1);
+            for (var i = 0; i < trained.length; i++) {
+                var bbx = new Block(BlockSpecs.getGestureSpec(trained[i]), true, blockscale);
+                setProps(bbx.div.style, {
+                    position: 'absolute',
+                    left: dx + 'px',
+                    top: blockdy + 'px'
+                });
+                pal.appendChild(bbx.div);
+                bbx.lift();
+                dx += betweenblocks;
+            }
+        });
+    }
+
+    static addGestureTrainerButton (pal, dx) {
+        var button = newHTML('div', 'gesturetrainerbutton', pal);
+        button.textContent = 'AI TRAIN';
+        setProps(button.style, {
+            position: 'absolute',
+            left: dx + 'px',
+            top: Math.max(4, blockdy) + 'px'
+        });
+        button.onmousedown = button.ontouchstart = function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            var projectId = ScratchJr.currentProject || 'default';
+            window.location.href = 'aitrainer.html?projectId=' + encodeURIComponent(projectId);
+        };
     }
 
     static addSoundsBlocks (dx) {

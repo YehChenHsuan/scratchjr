@@ -196,8 +196,15 @@ export default class Ghost {
             dogohst = mt ? (mt.getAttribute('fixed') != 'yes') : false;
             break;
         case 'paintbucket':
+            mt = Ghost.getHitObject(pt, false);
+            break;
         case 'camera':
-            mt = Ghost.getHitObject(pt, Paint.mode == 'path');
+            // For camera mode, accept any element the mask or SVG hit — including
+            // the interior of a filled shape. If the element is fixed/background,
+            // fall back to a deeper hit test.
+            if (!mt || mt.getAttribute('fixed') == 'yes') {
+                mt = Ghost.getHitObject(pt, false);
+            }
             break;
         }
         if (mt && dogohst) {

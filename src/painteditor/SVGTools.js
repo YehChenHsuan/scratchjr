@@ -441,6 +441,13 @@ export default class SVGTools {
         case 'clipPath':
             box = SVGTools.getTransformedBox(elem.childNodes[0]);
             break;
+        case 'rect':
+            box.x = Number(elem.getAttribute('x'));
+            box.y = Number(elem.getAttribute('y'));
+            box.width = Number(elem.getAttribute('width'));
+            box.height = Number(elem.getAttribute('height'));
+            box = box.expandBy(SVGTools.getPenWidthForm(elem));
+            break;
         case 'image':
             box.x = Number(elem.getAttribute('x'));
             box.y = Number(elem.getAttribute('y'));
