@@ -27,7 +27,8 @@ export default class GestureTrainer {
         // AND already calls `mobilenet.load()` to produce a usable model
         // instance. Reuse that instance (it has .infer()) — the global
         // `window.mobilenet` is only the namespace and has no infer fn.
-        await this.engine.startCameraOnly(document.getElementById('gesture-trainer-video'));
+        await this.engine.startCameraOnly(document.getElementById('gesture-trainer-video'),
+            document.getElementById('gesture-trainer-overlay'));
         this.tf = window.tf;
         this.knnClassifier = window.knnClassifier;
         this.mobilenet = this.engine.mobilenetModel;  // loaded model
@@ -63,7 +64,7 @@ export default class GestureTrainer {
         this.sampleCounts[gestureId] = 0;
     }
 
-    startCollecting (gestureId, videoEl, onTick) {
+    startCollecting (gestureId, onTick) {
         this.stopCollecting();
         const target = MAX_SAMPLES;
         this.collectingTimer = setInterval(async () => {
@@ -74,7 +75,7 @@ export default class GestureTrainer {
                 }
                 return;
             }
-            const act = this.mobilenet ? this.mobilenet.infer(videoEl, 'conv_preds') : null;
+            const act = await this.engine.getActivation();
             if (act) {
                 this.knn.addExample(act, gestureId);
                 act.dispose();
@@ -93,11 +94,13 @@ export default class GestureTrainer {
         this.collectingTimer = null;
     }
 
-    async testOnce (videoEl) {
+    async testOnce () {
         if (this.knn.getNumClasses() === 0) return null;
-        const act = this.mobilenet.infer(videoEl, 'conv_preds');
+        const act = await this.engine.getActivation();
+        if (!act) return null;
         const res = await this.knn.predictClass(act);
         act.dispose();
+        res.label = this.engine._resolveLabel(res);
         return res;
     }
 

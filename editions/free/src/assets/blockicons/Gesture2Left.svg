@@ -1,12 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="85" height="66" viewBox="0 0 85 66">
-  <g transform="rotate(-90 42.5 33)">
-    <g transform="translate(2 3)" fill="#D6BD05">
-      <path d="M34 5 22 19h7v9h10v-9h7zM51 5 39 19h7v9h10v-9h7z"/>
-      <path d="M30 18c0-2.4 1.9-4.3 4.3-4.3s4.3 1.9 4.3 4.3v25h7.8V18c0-2.4 1.9-4.3 4.3-4.3S55 15.6 55 18v25h6v7H25v-7h5z"/>
-    </g>
-    <g fill="#FFF">
-      <path d="M34 5 22 19h7v9h10v-9h7zM51 5 39 19h7v9h10v-9h7z"/>
-      <path d="M30 18c0-2.4 1.9-4.3 4.3-4.3s4.3 1.9 4.3 4.3v25h7.8V18c0-2.4 1.9-4.3 4.3-4.3S55 15.6 55 18v25h6v7H25v-7h5z"/>
-    </g>
-  </g>
+  <path fill="#fff" stroke="#D6BD05" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"
+    d="M6 33 L20 20.5 V27.5 L12.5 33 L20 38.5 V45.5 Z"/>
+  <path fill="#fff" stroke="#D6BD05" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
+    d="M18 33 L37 15 V26 H60 V40 H37 V51 Z"/>
 </svg>

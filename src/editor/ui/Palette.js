@@ -384,10 +384,10 @@ export default class Palette {
             }
         }
         dx += 30;
-        if (n == (BlockSpecs.categories.length - 1)) {
+        if (n == BlockSpecs.categories.length - 1) {
             Palette.addGestureBlocks(dxblocks);
         }
-        if ((n == (BlockSpecs.categories.length - 1)) && (ScratchJr.stage.pages.length > 1)) {
+        if ((n == BlockSpecs.STOP_CATEGORY_INDEX) && (ScratchJr.stage.pages.length > 1)) {
             Palette.addPagesBlocks(dx);
         }
         if ((n == 3) && (ScratchJr.getSprite().sounds.length > 0)) {
@@ -398,6 +398,9 @@ export default class Palette {
     static reset () {
         if (numcat == (BlockSpecs.categories.length - 1)) {
             Palette.selectCategory(BlockSpecs.categories.length - 1);
+        }
+        if (numcat == BlockSpecs.STOP_CATEGORY_INDEX) {
+            Palette.selectCategory(BlockSpecs.STOP_CATEGORY_INDEX);
         }
         if (numcat == 3) {
             Palette.selectCategory(3);

@@ -50,6 +50,14 @@ export default class BlockSpecs {
         return speeds;
     }
 
+    // Fixed index of the Stop (red) category within setupCategories().
+    // Stage-switch ("go to page") blocks belong on this page; kept as a
+    // named constant since Gesture was appended after it, so
+    // "categories.length - 1" no longer points at Stop.
+    static get STOP_CATEGORY_INDEX () {
+        return 5;
+    }
+
     static initBlocks () {
         loadassets = new Object();
         BlockSpecs.loadGraphics();

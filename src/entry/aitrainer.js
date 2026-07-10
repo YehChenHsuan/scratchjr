@@ -17,6 +17,7 @@ export function aiTrainerMain () {
           <button id="ait-next" class="ait-hotspot ait-next-hit" aria-label="Next gesture"></button>
           <button id="ait-reset" class="ait-hotspot ait-reset-hit" aria-label="Reset gesture"></button>
           <video id="gesture-trainer-video" autoplay playsinline muted></video>
+          <canvas id="gesture-trainer-overlay" aria-hidden="true"></canvas>
           <div class="ait-status state-camera" id="ait-status" aria-label="Preparing camera"></div>
           <div id="ait-grid" class="ait-grid"></div>
           <div class="ait-actions">
@@ -36,7 +37,6 @@ export function aiTrainerMain () {
     const grid = document.getElementById('ait-grid');
     const progressEl = document.getElementById('ait-progress');
     const resultEl = document.getElementById('ait-result');
-    const videoEl = document.getElementById('gesture-trainer-video');
 
     let selectedId = null;
     let trainer = null;
@@ -155,7 +155,7 @@ export function aiTrainerMain () {
             return;
         }
         setStatus('collect', `Collecting ${gestureShortLabel(selectedId)}`);
-        trainer.startCollecting(selectedId, videoEl, (n, target, done) => {
+        trainer.startCollecting(selectedId, (n, target, done) => {
             updateCellCount(selectedId, n);
             updateProgress();
             if (done) {
@@ -175,7 +175,7 @@ export function aiTrainerMain () {
         if (!trainer) {
             return;
         }
-        const res = await trainer.testOnce(videoEl);
+        const res = await trainer.testOnce();
         if (!res) {
             setResult('empty', 'No trained gestures yet.');
             return;

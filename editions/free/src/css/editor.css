@@ -261,7 +261,7 @@ div.frame {
 }
 
 #blockspalette .gesturetrainerbutton {
-    width: ${78 * scaleMultiplier}px;
+    width: ${50 * scaleMultiplier}px;
     height: ${50 * scaleMultiplier}px;
     position: relative;
     background: #fff7ce;
@@ -275,27 +275,41 @@ div.frame {
 #blockspalette .gesturetrainerbutton:before {
     content: "";
     position: absolute;
-    left: ${14 * scaleMultiplier}px;
-    top: ${9 * scaleMultiplier}px;
-    width: ${20 * scaleMultiplier}px;
-    height: ${27 * scaleMultiplier}px;
-    border-radius: ${10 * scaleMultiplier}px ${10 * scaleMultiplier}px ${7 * scaleMultiplier}px ${7 * scaleMultiplier}px;
-    background: #13b9c8;
-    box-shadow:
-        ${14 * scaleMultiplier}px ${10 * scaleMultiplier}px 0px ${-5 * scaleMultiplier}px #13b9c8,
-        ${28 * scaleMultiplier}px ${10 * scaleMultiplier}px 0px ${-5 * scaleMultiplier}px #13b9c8;
+    inset: ${6 * scaleMultiplier}px;
+    background: url('../assets/ui/gesture-settings.svg') center / contain no-repeat;
 }
 
-#blockspalette .gesturetrainerbutton:after {
-    content: "";
+.gesture-camera-preview {
+    position: fixed;
+    right: ${16 * scaleMultiplier}px;
+    bottom: ${16 * scaleMultiplier}px;
+    width: ${220 * scaleMultiplier}px;
+    aspect-ratio: 4 / 3;
+    z-index: 10000;
+    overflow: hidden;
+    border: ${5 * scaleMultiplier}px solid #00bcd4;
+    border-radius: ${14 * scaleMultiplier}px;
+    background: #10252d;
+    box-shadow: 0 ${5 * scaleMultiplier}px 0 rgba(0,0,0,.22), inset 0 0 0 ${3 * scaleMultiplier}px #fff7ce;
+    pointer-events: none;
+}
+
+.gesture-camera-preview video,
+.gesture-camera-preview canvas {
     position: absolute;
-    right: ${9 * scaleMultiplier}px;
-    top: ${7 * scaleMultiplier}px;
-    width: ${18 * scaleMultiplier}px;
-    height: ${18 * scaleMultiplier}px;
-    border-radius: 50%;
-    border: ${4 * scaleMultiplier}px solid #13b9c8;
-    background: #fff;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gesture-camera-preview video {
+    transform: scaleX(-1);
+}
+
+.gesture-camera-preview canvas {
+    z-index: 2;
+    transform: scaleX(-1);
 }
 
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */

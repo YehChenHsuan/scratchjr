@@ -33,6 +33,8 @@ let storyStarted = false;
 let runtime = undefined;
 let gestureEngine = undefined;
 let gestureVideo = undefined;
+let gesturePreview = undefined;
+let gestureOverlay = undefined;
 let gestureStartRequest = 0;
 let stage = undefined;
 let inFullscreen = false;
@@ -503,19 +505,24 @@ export default class ScratchJr {
             return;
         }
         if (!gestureVideo) {
+            gesturePreview = document.createElement('div');
+            gesturePreview.className = 'gesture-camera-preview';
             gestureVideo = document.createElement('video');
             gestureVideo.setAttribute('playsinline', 'playsinline');
             gestureVideo.muted = true;
-            gestureVideo.style.display = 'none';
-            document.body.appendChild(gestureVideo);
+            gestureOverlay = document.createElement('canvas');
+            gesturePreview.appendChild(gestureVideo);
+            gesturePreview.appendChild(gestureOverlay);
+            document.body.appendChild(gesturePreview);
         }
+        gesturePreview.style.display = 'block';
         if (!gestureEngine) {
             gestureEngine = new GestureEngine();
             gestureEngine.onGestureDetected((gestureId) => {
                 ScratchJr.startScriptsForGesture(gestureId);
             });
         }
-        gestureEngine.start(currentProject, gestureVideo).catch(e => {
+        gestureEngine.start(currentProject, gestureVideo, gestureOverlay).catch(e => {
             console.warn('[GestureEngine] start failed', e);
         });
     }
@@ -524,6 +531,9 @@ export default class ScratchJr {
         gestureStartRequest++;
         if (gestureEngine) {
             gestureEngine.stop();
+        }
+        if (gesturePreview) {
+            gesturePreview.style.display = 'none';
         }
     }
 
