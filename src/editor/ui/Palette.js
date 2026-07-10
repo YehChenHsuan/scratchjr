@@ -458,7 +458,8 @@ export default class Palette {
 
     static addGestureTrainerButton (pal, dx) {
         var button = newHTML('div', 'gesturetrainerbutton', pal);
-        button.textContent = 'AI TRAIN';
+        button.setAttribute('aria-label', 'AI gesture trainer');
+        button.setAttribute('title', 'AI gesture trainer');
         setProps(button.style, {
             position: 'absolute',
             left: dx + 'px',

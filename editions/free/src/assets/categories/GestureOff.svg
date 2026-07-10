@@ -1,33 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="51" height="57" viewBox="0 0 51 57">
-  <!-- StopOff.svg's layer stack (inner frame raised to y=2..45),
-       recoloured red -> teal. White hand glyph from _hand-glyph.svg,
-       shifted up by ~7.67 so it tracks the raised panel. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
   <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.445" y1="1761.074" x2="25.445" y2="1716.074" gradientTransform="translate(0 -1706.074)">
     <stop offset="0" stop-opacity=".5"/>
     <stop offset=".09" stop-opacity=".455"/>
     <stop offset="1" stop-opacity="0"/>
   </linearGradient>
   <path opacity=".5" fill="url(#a)" d="M47.945 47.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
-  <path fill="#C9BF8B" d="M47.945 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
-  <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="25.445" y1="1762.672" x2="25.445" y2="1718.102" gradientTransform="translate(0 -1706.074)">
-    <stop offset="0" stop-opacity=".5"/>
-    <stop offset=".09" stop-opacity=".455"/>
-    <stop offset="1" stop-opacity="0"/>
-  </linearGradient>
-  <path opacity=".5" fill="url(#b)" d="M47.945 48.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
   <path fill="#0097A7" d="M48.057 46.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
-  <path fill="#0097A7" d="M10.556 53.5c-3.858 0-7-3.141-7-7v-30c0-3.86 3.142-7 7-7h30c3.856 0 7 3.14 7 7v30c0 3.859-3.144 7-7 7h-30z"/>
   <path fill="#0097A7" d="M48.057 36.5c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-28c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v28z"/>
-  <path fill="#4DD0E1" d="M40.557 1.5h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7zm6.5 37c0 3.584-2.916 6.5-6.5 6.5h-30a6.508 6.508 0 0 1-6.5-6.5v-30c0-3.584 2.916-6.5 6.5-6.5h30c3.584 0 6.5 2.916 6.5 6.5v30z"/>
-  <path opacity=".3" fill="#FFF" d="M40.557 1.5h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7zm6.5 37c0 3.584-2.916 6.5-6.5 6.5h-30a6.508 6.508 0 0 1-6.5-6.5v-30c0-3.584 2.916-6.5 6.5-6.5h30c3.584 0 6.5 2.916 6.5 6.5v30z"/>
-  <path fill="#F7EC9F" d="M40.557 2h-30a6.508 6.508 0 0 0-6.5 6.5v30c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5z"/>
   <path fill="#00BCD4" d="M40.557 2h-30a6.508 6.508 0 0 0-6.5 6.5v30c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5z"/>
-  <linearGradient id="c" gradientUnits="userSpaceOnUse" x1="25.556" y1="1663.575" x2="25.556" y2="1695.873" gradientTransform="translate(0 -1662)">
+  <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="25.556" y1="1663.575" x2="25.556" y2="1695.873" gradientTransform="translate(0 -1662)">
     <stop offset="0" stop-color="#fff" stop-opacity=".5"/>
     <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
     <stop offset="1" stop-color="#fff" stop-opacity="0"/>
   </linearGradient>
-  <path fill="url(#c)" d="M4.056 38.5c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5h-30a6.508 6.508 0 0 0-6.5 6.5v30z"/>
-  <!-- White hand glyph, shifted up by 7.67 to track the raised Off panel -->
-  <image x="13" y="6.33" width="24" height="35.5" preserveAspectRatio="xMidYMid meet" opacity=".95" xlink:href="_hand-glyph.svg"/>
+  <path fill="url(#b)" d="M4.056 38.5c0 3.584 2.916 6.5 6.5 6.5h30c3.584 0 6.5-2.916 6.5-6.5v-30c0-3.584-2.916-6.5-6.5-6.5h-30a6.508 6.508 0 0 0-6.5 6.5v30z"/>
+  <g fill="#FFF" opacity=".96">
+    <rect x="13" y="6.4" width="5.2" height="22" rx="2.6"/>
+    <rect x="19.5" y=".4" width="5.2" height="28" rx="2.6"/>
+    <rect x="26" y="-1.6" width="5.2" height="30" rx="2.6"/>
+    <rect x="32.5" y="4.4" width="5.2" height="24" rx="2.6"/>
+    <path d="M10.5 23.4c0 9 6.2 15 16.5 15h5c7.5 0 12-4.7 12-12v-8.2h-6v7.7c0 3.3-2.1 5.5-5.3 5.5H22c-6.8 0-11.5-3-11.5-8z"/>
+  </g>
 </svg>

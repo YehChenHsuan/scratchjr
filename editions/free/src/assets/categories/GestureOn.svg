@@ -1,27 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="51" height="57" viewBox="0 0 51 57">
-  <!-- StopOn.svg's layer stack, recoloured red -> teal. The central P
-       glyph is replaced with the user-supplied white hand image
-       (_hand-glyph.svg), placed inside the inner frame (y=9.67..46.67)
-       so it shifts down with the panel in the On state. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="51" height="57" viewBox="0 0 51 57">
   <linearGradient id="a" gradientUnits="userSpaceOnUse" x1="25.556" y1="-594.661" x2="25.556" y2="-561.828" gradientTransform="matrix(1 0 0 -1 0 -540.074)">
     <stop offset="0" stop-color="#fff"/>
     <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
     <stop offset="1" stop-color="#fff" stop-opacity="0"/>
   </linearGradient>
   <path opacity=".75" fill="url(#a)" d="M10.556 54.67c-4.411 0-8-3.59-8-8v-30c0-4.411 3.589-8 8-8h30c4.41 0 8 3.589 8 8v30c0 4.41-3.59 8-8 8h-30z"/>
-  <linearGradient id="b" gradientUnits="userSpaceOnUse" x1="25.556" y1="-594.661" x2="25.556" y2="-561.828" gradientTransform="matrix(1 0 0 -1 0 -540.074)">
-    <stop offset="0" stop-color="#fff"/>
-    <stop offset=".09" stop-color="#fff" stop-opacity=".91"/>
-    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-  </linearGradient>
-  <path opacity=".75" fill="url(#b)" d="M10.556 54.67c-4.411 0-8-3.59-8-8v-30c0-4.411 3.589-8 8-8h30c4.41 0 8 3.589 8 8v30c0 4.41-3.59 8-8 8h-30z"/>
   <path fill="#0097A7" d="M48.057 46.67c0 4.125-3.375 7.5-7.5 7.5h-30c-4.125 0-7.5-3.375-7.5-7.5v-30c0-4.125 3.375-7.5 7.5-7.5h30c4.125 0 7.5 3.375 7.5 7.5v30z"/>
   <path fill="#00BCD4" d="M40.557 9.67h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.859 0 7-3.141 7-7v-30c0-3.86-3.141-7-7-7z"/>
-  <!-- White hand glyph (user-supplied). Centered in the inner frame.
-       Inner frame: x=3.557..43.557 (w=40), y=9.67..46.67 (h=37).
-       Glyph aspect ~352:521. Width 24 keeps proportional height ~35.5.
-       Placed slightly above the vertical center to leave room at the
-       wrist, matching how StopOn's P sits in the lower half. -->
-  <image x="13" y="14" width="24" height="35.5" preserveAspectRatio="xMidYMid meet" xlink:href="_hand-glyph.svg"/>
+  <g fill="#FFF" transform="translate(0 7.6)">
+    <rect x="13" y="14" width="5.2" height="22" rx="2.6"/>
+    <rect x="19.5" y="8" width="5.2" height="28" rx="2.6"/>
+    <rect x="26" y="6" width="5.2" height="30" rx="2.6"/>
+    <rect x="32.5" y="12" width="5.2" height="24" rx="2.6"/>
+    <path d="M10.5 31c0 9 6.2 15 16.5 15h5c7.5 0 12-4.7 12-12v-8.2h-6v7.7c0 3.3-2.1 5.5-5.3 5.5H22c-6.8 0-11.5-3-11.5-8z"/>
+  </g>
   <path fill-opacity=".17" d="M40.466 9.67h-30c-3.858 0-7 3.14-7 7v30c0 3.859 3.142 7 7 7h30c3.86 0 7-3.141 7-7v-30c0-3.86-3.14-7-7-7zm5.5 37c0 3.033-2.467 5.5-5.5 5.5h-30a5.506 5.506 0 0 1-5.5-5.5v-30c0-3.033 2.467-5.5 5.5-5.5h30c3.033 0 5.5 2.467 5.5 5.5v30z"/>
 </svg>

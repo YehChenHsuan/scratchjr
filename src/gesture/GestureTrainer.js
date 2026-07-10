@@ -55,6 +55,14 @@ export default class GestureTrainer {
         return this.sampleCounts[gestureId] || 0;
     }
 
+    resetGesture (gestureId) {
+        this.stopCollecting();
+        if (this.knn && this.knn.clearClass) {
+            this.knn.clearClass(gestureId);
+        }
+        this.sampleCounts[gestureId] = 0;
+    }
+
     startCollecting (gestureId, videoEl, onTick) {
         this.stopCollecting();
         const target = MAX_SAMPLES;

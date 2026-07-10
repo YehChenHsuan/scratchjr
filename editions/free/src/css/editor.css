@@ -263,18 +263,39 @@ div.frame {
 #blockspalette .gesturetrainerbutton {
     width: ${78 * scaleMultiplier}px;
     height: ${50 * scaleMultiplier}px;
-    line-height: ${50 * scaleMultiplier}px;
-    text-align: center;
-    font-family: Verdana, sans-serif;
-    font-size: ${12 * scaleMultiplier}px;
-    font-weight: bold;
-    color: #0a5a64;
+    position: relative;
     background: #fff7ce;
     border: ${3 * scaleMultiplier}px solid #13b9c8;
     border-radius: ${8 * scaleMultiplier}px;
     box-shadow: inset 0px ${-4 * scaleMultiplier}px 0px rgba(0,0,0,.12);
     cursor: pointer;
     user-select: none;
+}
+
+#blockspalette .gesturetrainerbutton:before {
+    content: "";
+    position: absolute;
+    left: ${14 * scaleMultiplier}px;
+    top: ${9 * scaleMultiplier}px;
+    width: ${20 * scaleMultiplier}px;
+    height: ${27 * scaleMultiplier}px;
+    border-radius: ${10 * scaleMultiplier}px ${10 * scaleMultiplier}px ${7 * scaleMultiplier}px ${7 * scaleMultiplier}px;
+    background: #13b9c8;
+    box-shadow:
+        ${14 * scaleMultiplier}px ${10 * scaleMultiplier}px 0px ${-5 * scaleMultiplier}px #13b9c8,
+        ${28 * scaleMultiplier}px ${10 * scaleMultiplier}px 0px ${-5 * scaleMultiplier}px #13b9c8;
+}
+
+#blockspalette .gesturetrainerbutton:after {
+    content: "";
+    position: absolute;
+    right: ${9 * scaleMultiplier}px;
+    top: ${7 * scaleMultiplier}px;
+    width: ${18 * scaleMultiplier}px;
+    height: ${18 * scaleMultiplier}px;
+    border-radius: 50%;
+    border: ${4 * scaleMultiplier}px solid #13b9c8;
+    background: #fff;
 }
 
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */

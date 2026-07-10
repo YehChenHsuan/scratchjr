@@ -10,39 +10,29 @@ export function aiTrainerMain () {
 
     const root = document.getElementById('aitrainer-root');
     root.innerHTML = `
-      <header class="ait-header">
-        <button id="ait-back">Back</button>
-        <div>
-          <h1>AI Gesture Trainer</h1>
-          <p>Train one-finger or two-finger direction commands for this project.</p>
-        </div>
-        <small>${projectId}</small>
-      </header>
       <div class="ait-body">
-        <div class="ait-video-wrap">
+        <div class="ait-stage">
+          <button id="ait-back" class="ait-hotspot ait-back-hit" aria-label="Back"></button>
+          <button id="ait-camera" class="ait-hotspot ait-camera-hit" aria-label="Restart camera"></button>
+          <button id="ait-next" class="ait-hotspot ait-next-hit" aria-label="Next gesture"></button>
+          <button id="ait-reset" class="ait-hotspot ait-reset-hit" aria-label="Reset gesture"></button>
           <video id="gesture-trainer-video" autoplay playsinline muted></video>
-          <div class="ait-status" id="ait-status">Preparing camera...</div>
-          <div class="ait-camera-guide">
-            <span>Keep hand centered</span>
-            <span>Point clearly: up / down / left / right</span>
-          </div>
-        </div>
-        <aside class="ait-controls">
-          <div class="ait-panel-title">Available gestures</div>
+          <div class="ait-status state-camera" id="ait-status" aria-label="Preparing camera"></div>
           <div id="ait-grid" class="ait-grid"></div>
           <div class="ait-actions">
-            <button id="ait-collect">Collect</button>
-            <button id="ait-stop">Stop</button>
-            <button id="ait-test">Test</button>
-            <button id="ait-save">Save model</button>
+            <button id="ait-collect" class="ait-hotspot action-collect" aria-label="Collect"></button>
+            <button id="ait-stop" class="ait-hotspot action-stop" aria-label="Stop"></button>
+            <button id="ait-test" class="ait-hotspot action-test" aria-label="Test"></button>
+            <button id="ait-save" class="ait-hotspot action-save" aria-label="Save model"></button>
           </div>
           <div id="ait-progress" class="ait-progress"></div>
           <div id="ait-result" class="ait-result"></div>
-        </aside>
+        </div>
       </div>
     `;
 
     const status = document.getElementById('ait-status');
+    const stageEl = root.querySelector('.ait-stage');
     const grid = document.getElementById('ait-grid');
     const progressEl = document.getElementById('ait-progress');
     const resultEl = document.getElementById('ait-result');
@@ -50,40 +40,81 @@ export function aiTrainerMain () {
 
     let selectedId = null;
     let trainer = null;
+    let initRequest = 0;
+
+    function bindPress (element, handler) {
+        let lastPress = 0;
+        const press = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const now = Date.now();
+            if (now - lastPress < 600) {
+                return;
+            }
+            lastPress = now;
+            handler();
+        };
+        element.onmousedown = press;
+        element.ontouchstart = press;
+    }
+
+    function selectGesture (id) {
+        selectedId = id;
+        Array.from(grid.children).forEach(cell => {
+            cell.classList.toggle('selected', cell.dataset.id === id);
+        });
+        updateProgress();
+    }
 
     GESTURE_DEFS.forEach(def => {
         const cell = document.createElement('div');
         cell.className = 'ait-cell';
         cell.dataset.id = def.id;
-        cell.innerHTML = `<div class="ait-cell-glyph">${def.glyph}</div>` +
-            `<div class="ait-cell-label">${def.label}</div><div class="ait-cell-count">0</div>`;
-        cell.onmousedown = () => {
-            selectedId = def.id;
-            Array.from(grid.children).forEach(c => c.classList.remove('selected'));
-            cell.classList.add('selected');
-            updateProgress();
-        };
+        cell.setAttribute('aria-label', def.label);
+        cell.innerHTML = `<div class="ait-cell-icon gesture-${def.fingers}-${def.direction}">` +
+            '<span class="hand-palm"></span><span class="finger finger-a"></span>' +
+            '<span class="finger finger-b"></span><span class="hand-thumb"></span></div>' +
+            '<div class="ait-cell-meter"><span></span></div>';
+        bindPress(cell, () => selectGesture(def.id));
         grid.appendChild(cell);
     });
 
     function updateCellCount (id, n) {
         const cell = grid.querySelector(`[data-id="${id}"]`);
         if (cell) {
-            cell.querySelector('.ait-cell-count').textContent = String(n);
-            if (n >= MIN_SAMPLES) cell.classList.add('trained');
+            const meter = cell.querySelector('.ait-cell-meter span');
+            if (meter) {
+                meter.style.width = Math.min(100, Math.round((n / MAX_SAMPLES) * 100)) + '%';
+            }
+            cell.classList.toggle('trained', n >= MIN_SAMPLES);
         }
     }
 
     function updateProgress () {
         if (!selectedId || !trainer) {
-            progressEl.textContent = '';
+            progressEl.style.display = 'none';
             return;
         }
         const n = trainer.getSampleCount(selectedId);
-        progressEl.textContent = `${gestureShortLabel(selectedId)}: ${n} / ${MAX_SAMPLES}`;
+        progressEl.style.display = 'block';
+        progressEl.style.setProperty('--progress', Math.min(100, Math.round((n / MAX_SAMPLES) * 100)) + '%');
+        progressEl.setAttribute('aria-label', `${gestureShortLabel(selectedId)}: ${n} / ${MAX_SAMPLES}`);
     }
 
-    document.getElementById('ait-back').onmousedown = () => {
+    function setStatus (state, label) {
+        status.className = 'ait-status state-' + state;
+        status.setAttribute('aria-label', label);
+        stageEl.dataset.state = state;
+    }
+
+    function setResult (state, label) {
+        resultEl.style.display = 'block';
+        resultEl.className = 'ait-result result-' + state;
+        resultEl.setAttribute('aria-label', label);
+    }
+
+    bindPress(document.getElementById('ait-back'), () => {
+        initRequest++;
         if (trainer) {
             trainer.dispose();
         }
@@ -91,70 +122,115 @@ export function aiTrainerMain () {
             ? 'editor.html?pmd5=' + encodeURIComponent(projectId) + '&mode=edit'
             : 'editor.html';
         window.location.href = back;
-    };
+    });
 
-    document.getElementById('ait-collect').onmousedown = () => {
-        if (!selectedId || !trainer) {
-            alert('Please select a gesture first.');
+    bindPress(document.getElementById('ait-camera'), () => initializeTrainer());
+
+    bindPress(document.getElementById('ait-next'), () => {
+        const current = GESTURE_DEFS.findIndex(def => def.id === selectedId);
+        for (let offset = 1; offset <= GESTURE_DEFS.length; offset++) {
+            const def = GESTURE_DEFS[(current + offset + GESTURE_DEFS.length) % GESTURE_DEFS.length];
+            if (!trainer || trainer.getSampleCount(def.id) < MIN_SAMPLES) {
+                selectGesture(def.id);
+                return;
+            }
+        }
+        selectGesture(GESTURE_DEFS[(current + 1 + GESTURE_DEFS.length) % GESTURE_DEFS.length].id);
+    });
+
+    bindPress(document.getElementById('ait-reset'), () => {
+        if (!trainer || !selectedId) {
+            setStatus('error', 'Select a gesture first.');
             return;
         }
-        status.textContent = `Collecting ${gestureShortLabel(selectedId)}`;
+        trainer.resetGesture(selectedId);
+        updateCellCount(selectedId, 0);
+        updateProgress();
+        setStatus('ready', 'Gesture reset.');
+    });
+
+    bindPress(document.getElementById('ait-collect'), () => {
+        if (!selectedId || !trainer) {
+            setStatus('error', 'Select a gesture first.');
+            return;
+        }
+        setStatus('collect', `Collecting ${gestureShortLabel(selectedId)}`);
         trainer.startCollecting(selectedId, videoEl, (n, target, done) => {
             updateCellCount(selectedId, n);
             updateProgress();
             if (done) {
-                status.textContent = `Finished collecting ${gestureShortLabel(selectedId)}`;
+                setStatus('done', `Finished collecting ${gestureShortLabel(selectedId)}`);
             }
         });
-    };
+    });
 
-    document.getElementById('ait-stop').onmousedown = () => {
+    bindPress(document.getElementById('ait-stop'), () => {
         if (trainer) {
             trainer.stopCollecting();
         }
-        status.textContent = 'Stopped';
-    };
+        setStatus('stop', 'Stopped');
+    });
 
-    document.getElementById('ait-test').onmousedown = async () => {
+    bindPress(document.getElementById('ait-test'), async () => {
         if (!trainer) {
             return;
         }
         const res = await trainer.testOnce(videoEl);
         if (!res) {
-            resultEl.textContent = 'No trained gestures yet.';
+            setResult('empty', 'No trained gestures yet.');
             return;
         }
-        resultEl.textContent = `Detected ${gestureShortLabel(res.label)} ` +
-            `(${(res.confidences[res.label] * 100).toFixed(0)}%)`;
-    };
+        setResult('hit', `Detected ${gestureShortLabel(res.label)} ` +
+            `(${(res.confidences[res.label] * 100).toFixed(0)}%)`);
+    });
 
-    document.getElementById('ait-save').onmousedown = async () => {
+    bindPress(document.getElementById('ait-save'), async () => {
         if (!trainer) {
             return;
         }
         const saved = await trainer.saveModel();
         if (saved.length === 0) {
-            alert('Each gesture needs at least ' + MIN_SAMPLES + ' samples.');
+            setResult('empty', 'Each gesture needs at least ' + MIN_SAMPLES + ' samples.');
             return;
         }
-        status.textContent = 'Saved ' + saved.length + ' gestures.';
+        setStatus('save', 'Saved ' + saved.length + ' gestures.');
         const back = projectId && projectId !== 'default'
             ? 'editor.html?pmd5=' + encodeURIComponent(projectId) + '&mode=edit'
             : 'editor.html';
         setTimeout(() => {
             window.location.href = back;
         }, 1500);
-    };
+    });
 
-    (async () => {
-        try {
-            trainer = new GestureTrainer(projectId);
-            await trainer.init();
-            status.textContent = 'Select a gesture to start training.';
-            GESTURE_DEFS.forEach(def => updateCellCount(def.id, trainer.getSampleCount(def.id)));
-        } catch (e) {
-            window.console.error(e);
-            status.textContent = 'Init failed: ' + e.message;
+    async function initializeTrainer () {
+        const request = ++initRequest;
+        let nextTrainer = null;
+        if (trainer) {
+            trainer.dispose();
+            trainer = null;
         }
-    })();
+        setStatus('camera', 'Preparing camera.');
+        try {
+            nextTrainer = new GestureTrainer(projectId);
+            await nextTrainer.init();
+            if (request !== initRequest) {
+                nextTrainer.dispose();
+                return;
+            }
+            trainer = nextTrainer;
+            setStatus('ready', 'Select a gesture to start training.');
+            GESTURE_DEFS.forEach(def => updateCellCount(def.id, trainer.getSampleCount(def.id)));
+            if (!selectedId) {
+                selectGesture(GESTURE_DEFS[0].id);
+            }
+        } catch (e) {
+            if (nextTrainer) {
+                nextTrainer.dispose();
+            }
+            window.console.error(e);
+            setStatus('error', 'Init failed: ' + e.message);
+        }
+    }
+
+    initializeTrainer();
 }
