@@ -3,6 +3,8 @@
 // Web Audio, getUserMedia, and MediaRecorder. All callbacks return a string
 // (JSON-stringified when appropriate) to mirror the original native bridge.
 
+import JSZip from 'jszip';
+
 const DB_NAME = 'scratchjr';
 const DB_VERSION = 1;
 const STORE_PROJECTS = 'projects';
@@ -42,6 +44,10 @@ function p (request) {
         request.onsuccess = () => resolve(request.result);
         request.onerror = () => reject(request.error);
     });
+}
+
+function allRecords (storeName) {
+    return tx(storeName).then(store => p(store.getAll()));
 }
 function cb (fcn, value) {
     if (fcn) setTimeout(() => fcn(typeof value === 'string' ? value : JSON.stringify(value)), 0);
@@ -486,14 +492,98 @@ export default class Web {
 
     // ---- Share & misc -----------------------------------------------------
     static createZipForProject (projectData, metadata, name, fcn) {
-        // Simplified: download project JSON. A real zip implementation
-        // (e.g. JSZip) can be added later if cross-device sharing is needed.
-        const blob = new Blob([projectData], {type: 'application/json'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = name + '.sjr.json';
-        a.click();
-        cb(fcn, name + '.sjr.json');
+        const safeName = (name || 'ScratchJrProject').replace(/[^a-z0-9_-]/gi, '_');
+        const zip = new JSZip();
+        const project = zip.folder('project');
+        project.file('data.json', projectData);
+
+        Promise.all([
+            allRecords(STORE_MEDIA),
+            allRecords(STORE_USERSHAPES),
+            allRecords(STORE_USERBKGS)
+        ]).then(([media, userShapes, userBackgrounds]) => {
+            const parsed = JSON.parse(projectData);
+            const projectId = String(parsed.id || '');
+            project.file('library/usershapes.json', JSON.stringify(userShapes));
+            project.file('library/userbkgs.json', JSON.stringify(userBackgrounds));
+            media.forEach(record => {
+                if (record && record.md5 && record.data) {
+                    project.file('media/' + record.md5, record.data, {base64: true});
+                }
+            });
+            return tx(STORE_GESTURES).then(store => p(store.get(projectId)));
+        }).then(gesture => {
+            if (gesture && gesture.payload) {
+                project.file('gestures/model.json', JSON.stringify(gesture.payload));
+            }
+            project.file('backup.json', JSON.stringify({format: 'scratchjr-web-backup', version: 1}));
+            return zip.generateAsync({type: 'blob', compression: 'DEFLATE'});
+        }).then(blob => {
+            const a = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            a.href = url;
+            a.download = safeName + '.sjr';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            cb(fcn, safeName + '.sjr');
+        }).catch(error => {
+            console.error('[Web.createZipForProject]', error);
+            cb(fcn, 'error');
+        });
+    }
+
+    static importProjectArchive (file, fcn) {
+        JSZip.loadAsync(file).then(async zip => {
+            const dataEntry = zip.file('project/data.json');
+            const markerEntry = zip.file('project/backup.json');
+            if (!dataEntry) throw new Error('Missing project/data.json');
+            if (markerEntry) {
+                const marker = JSON.parse(await markerEntry.async('string'));
+                if (marker.format !== 'scratchjr-web-backup') throw new Error('Unsupported backup');
+            }
+            const projectData = JSON.parse(await dataEntry.async('string'));
+            delete projectData.id;
+            projectData.deleted = 'NO';
+            projectData.isgift = '0';
+            projectData.mtime = Date.now().toString();
+
+            const mediaFiles = Object.keys(zip.files)
+                .filter(path => path.indexOf('project/media/') === 0 && !zip.files[path].dir);
+            for (const path of mediaFiles) {
+                const md5 = path.substring('project/media/'.length);
+                const data = await zip.file(path).async('base64');
+                const ext = md5.indexOf('.') > -1 ? md5.split('.').pop() : '';
+                await tx(STORE_MEDIA, 'readwrite').then(store => p(store.put({md5, data, ext})));
+            }
+
+            const projectStore = await tx(STORE_PROJECTS, 'readwrite');
+            const newProjectId = await p(projectStore.add(projectData));
+            await Web._restoreLibrary(zip, STORE_USERSHAPES, 'project/library/usershapes.json');
+            await Web._restoreLibrary(zip, STORE_USERBKGS, 'project/library/userbkgs.json');
+
+            const gestureEntry = zip.file('project/gestures/model.json');
+            if (gestureEntry) {
+                const payload = JSON.parse(await gestureEntry.async('string'));
+                const gestureStore = await tx(STORE_GESTURES, 'readwrite');
+                await p(gestureStore.put({projectId: String(newProjectId), payload, mtime: Date.now()}));
+            }
+            cb(fcn, String(newProjectId));
+        }).catch(error => {
+            console.error('[Web.importProjectArchive]', error);
+            cb(fcn, '');
+        });
+    }
+
+    static async _restoreLibrary (zip, storeName, path) {
+        const entry = zip.file(path);
+        if (!entry) return;
+        const records = JSON.parse(await entry.async('string'));
+        if (!Array.isArray(records)) return;
+        for (const original of records) {
+            const record = Object.assign({}, original);
+            delete record.id;
+            await tx(storeName, 'readwrite').then(store => p(store.add(record)));
+        }
     }
     static sendSjrToShareDialog () {}
     static deviceName (fcn) { cb(fcn, 'web'); }

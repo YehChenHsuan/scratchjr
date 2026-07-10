@@ -32,10 +32,6 @@ export default class GestureTrainer {
         this.tf = window.tf;
         this.knnClassifier = window.knnClassifier;
         this.mobilenet = this.engine.mobilenetModel;  // loaded model
-        if (!this.mobilenet && window.mobilenet && window.mobilenet.load) {
-            this.mobilenet = await window.mobilenet.load();
-            this.engine.mobilenetModel = this.mobilenet;
-        }
         this.knn = this.knnClassifier.create();
 
         // Restore previous samples if any.

@@ -10,11 +10,17 @@ const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'docs');
 const FREE_SRC = path.join(ROOT, 'editions', 'free', 'src');
 const BUNDLE = path.join(ROOT, 'src', 'build', 'bundles', 'app.bundle.js');
+function isPreservedDoc (p) {
+    const resolved = path.resolve(p);
+    return resolved === path.resolve(path.join(OUT, 'adr')) ||
+        (path.dirname(resolved) === path.resolve(OUT) && path.extname(resolved).toLowerCase() === '.md');
+}
 
 function rimraf (p) {
     if (!fs.existsSync(p)) return;
     for (const f of fs.readdirSync(p)) {
         const fp = path.join(p, f);
+        if (isPreservedDoc(fp)) continue;
         if (fs.statSync(fp).isDirectory()) { rimraf(fp); fs.rmdirSync(fp); }
         else fs.unlinkSync(fp);
     }
@@ -32,7 +38,17 @@ function copyDir (src, dst) {
 }
 
 console.log('==> webpack production build');
-execSync('npx webpack --mode=production', {cwd: ROOT, stdio: 'inherit'});
+execSync('npx webpack --mode=production', {
+    cwd: ROOT,
+    stdio: 'inherit',
+    env: Object.assign({}, process.env, {NODE_OPTIONS: '--openssl-legacy-provider'})
+});
+
+console.log('==> sync bundle and generate precache manifest');
+if (fs.existsSync(BUNDLE)) {
+    fs.copyFileSync(BUNDLE, path.join(FREE_SRC, 'app.bundle.js'));
+}
+execSync('node scripts/generate-precache.js', {cwd: ROOT, stdio: 'inherit'});
 
 console.log('==> reset', OUT);
 rimraf(OUT);

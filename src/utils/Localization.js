@@ -62,8 +62,10 @@ export default class Localization {
         );
 
         var desiredLocale = localizationLanguageParts.join('-');
-        if (desiredLocale in Object.keys(supportedLocales)) {
-            return desiredLocale;
+        for (var exactLocaleKey in supportedLocales) {
+            if (supportedLocales[exactLocaleKey] === desiredLocale) {
+                return desiredLocale;
+            }
         }
 
         // We're not supporting this locale yet - do we support an ancestor?
@@ -84,7 +86,7 @@ export default class Localization {
         var localizationCookie = Cookie.get('localization');
 
         if (localizationCookie === null) {
-            currentLocale = this.determineLocaleFromBrowser();
+            currentLocale = window.Settings.defaultLocale;
         } else {
             currentLocale = localizationCookie;
         }
@@ -122,6 +124,10 @@ export default class Localization {
             return message.format(formatting);
         }
         return keyOrRawText;
+    }
+
+    static hasKey (key) {
+        return key in localizationMessages;
     }
 
     // For sample projects, some fields (sprite names, text on stage, and text in say blocks)

@@ -1,20 +1,20 @@
-// Real-time gesture inference using MobileNet + KNN classifier.
-// All tf.js modules are loaded lazily from CDN to keep initial bundle small.
+// Real-time gesture inference using locally bundled MobileNet + KNN classifier.
 
 import GestureStorage from './GestureStorage';
 import {GESTURE_DEFS, getGestureDef} from './GestureDefs';
 
 let _tf = null, _mobilenet = null, _knnClassifier = null, _hands = null;
+const AI_ROOT = './vendor/ai/';
+const MOBILENET_MODEL = AI_ROOT + 'mobilenet/model/model.json';
 
 async function loadLibs () {
     if (_tf) {
         return {tf: _tf, mobilenet: _mobilenet, knnClassifier: _knnClassifier, Hands: _hands};
     }
-    // Pull from a CDN; users can self-host these by replacing the URLs.
-    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js');
-    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js');
-    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow-models/knn-classifier@1.2.4/dist/knn-classifier.min.js');
-    await loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js');
+    await loadScript(AI_ROOT + 'tfjs/tf.min.js');
+    await loadScript(AI_ROOT + 'mobilenet/mobilenet.min.js');
+    await loadScript(AI_ROOT + 'knn/knn-classifier.min.js');
+    await loadScript(AI_ROOT + 'mediapipe/hands.js');
     _tf = window.tf;
     _mobilenet = window.mobilenet;
     _knnClassifier = window.knnClassifier;
@@ -31,6 +31,15 @@ function loadScript (src) {
         const s = document.createElement('script');
         s.src = src; s.onload = () => resolve(); s.onerror = reject;
         document.head.appendChild(s);
+    });
+}
+
+function loadMobileNet (mobilenet) {
+    return mobilenet.load({
+        version: 1,
+        alpha: 1.0,
+        modelUrl: MOBILENET_MODEL,
+        inputRange: [0, 1]
     });
 }
 
@@ -78,14 +87,14 @@ export default class GestureEngine {
         await videoEl.play();
         await this._startHandTracking(libs.Hands, overlayCanvas);
         if (!this.mobilenetModel) {
-            this.mobilenetModel = await libs.mobilenet.load();
+            this.mobilenetModel = await loadMobileNet(libs.mobilenet);
         }
     }
 
     async getActivation () {
         if (!this.mobilenetModel) {
             const libs = await loadLibs();
-            this.mobilenetModel = await libs.mobilenet.load();
+            this.mobilenetModel = await loadMobileNet(libs.mobilenet);
         }
         return this.handDetected ? this.mobilenetModel.infer(this.handCanvas, 'conv_preds') : null;
     }
@@ -94,7 +103,7 @@ export default class GestureEngine {
         const libs = await loadLibs();
         this.tf = libs.tf;
         if (!this.mobilenetModel) {
-            this.mobilenetModel = await libs.mobilenet.load();
+            this.mobilenetModel = await loadMobileNet(libs.mobilenet);
         }
         this.knn = libs.knnClassifier.create();
         const stored = await GestureStorage.load(projectId, libs.tf);
@@ -193,8 +202,7 @@ export default class GestureEngine {
     async _startHandTracking (Hands, overlayCanvas) {
         this.overlayCanvas = overlayCanvas || this.overlayCanvas;
         if (!this.hands) {
-            this.hands = new Hands({locateFile: file =>
-                `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`});
+            this.hands = new Hands({locateFile: file => AI_ROOT + 'mediapipe/' + file});
             this.hands.setOptions({
                 maxNumHands: 1,
                 modelComplexity: 1,

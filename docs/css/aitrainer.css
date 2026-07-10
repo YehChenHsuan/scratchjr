@@ -1,0 +1,472 @@
+body {
+    margin: 0;
+    font-family: Verdana, sans-serif;
+    background: #ffe75a;
+    overflow: hidden;
+}
+
+#aitrainer-root {
+    width: 100vw;
+    height: 100vh;
+}
+
+.ait-body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffe75a;
+}
+
+.ait-stage {
+    position: relative;
+    width: min(100vw, calc(100vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    max-height: 100vh;
+    background: url("../assets/aitrainer/gesture-trainer-canva.svg") center center / 100% 100% no-repeat;
+    overflow: hidden;
+}
+
+.ait-hotspot {
+    position: absolute;
+    z-index: 5;
+    padding: 0;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.ait-hotspot:focus-visible,
+.ait-cell:focus-visible {
+    outline: 5px solid rgba(0, 188, 212, .72);
+    outline-offset: 2px;
+}
+
+.ait-back-hit {
+    left: 0.9%;
+    top: 2.2%;
+    width: 5.8%;
+    height: 9.4%;
+}
+
+.ait-camera-hit {
+    left: 7.05%;
+    top: 2.2%;
+    width: 5.6%;
+    height: 9.4%;
+}
+
+.ait-next-hit {
+    left: 12.8%;
+    top: 2.2%;
+    width: 5.6%;
+    height: 9.4%;
+}
+
+.ait-reset-hit {
+    left: 18.8%;
+    top: 2.2%;
+    width: 5.6%;
+    height: 9.4%;
+}
+
+#gesture-trainer-video {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 49.6%;
+    width: 49.9%;
+    height: 51.8%;
+    object-fit: cover;
+    transform: translate(-50%, -50%) scaleX(-1);
+    border: 5px solid #0bb4c4;
+    border-radius: 14px;
+    background: #10252d;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, .16), inset 0 0 0 3px #fff7ce;
+}
+
+#gesture-trainer-overlay {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    top: 49.6%;
+    width: 49.9%;
+    height: 51.8%;
+    transform: translate(-50%, -50%) scaleX(-1);
+    border-radius: 14px;
+    pointer-events: none;
+}
+
+.ait-stage[data-state="camera"] #gesture-trainer-video {
+    border-color: #ffbe57;
+    animation: ait-camera-pulse 900ms ease-in-out infinite alternate;
+}
+
+.ait-stage[data-state="ready"] #gesture-trainer-video,
+.ait-stage[data-state="done"] #gesture-trainer-video,
+.ait-stage[data-state="save"] #gesture-trainer-video {
+    border-color: #48cc7e;
+}
+
+.ait-stage[data-state="collect"] #gesture-trainer-video {
+    border-color: #ff9f2f;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, .16), 0 0 0 7px rgba(255, 190, 87, .34);
+}
+
+.ait-stage[data-state="collect"] .ait-cell.selected {
+    animation: ait-selected-pulse 650ms ease-in-out infinite alternate;
+}
+
+.ait-stage[data-state="error"] #gesture-trainer-video {
+    border-color: #d62222;
+}
+
+.ait-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.ait-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+}
+
+.ait-cell {
+    position: absolute;
+    padding: 0;
+    border: 5px solid transparent;
+    border-radius: 18px;
+    background: transparent;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ait-cell:hover {
+    background: rgba(255, 255, 255, .12);
+}
+
+.ait-cell.selected {
+    border-color: #00bcd4;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, .72);
+}
+
+.ait-cell.trained {
+    border-color: #48cc7e;
+}
+
+.ait-cell.trained:after {
+    content: "";
+    position: absolute;
+    right: 6%;
+    top: 8%;
+    width: 14%;
+    height: 8%;
+    border-left: 6px solid #287f46;
+    border-bottom: 6px solid #287f46;
+    transform: rotate(-45deg);
+    filter: drop-shadow(0 2px 0 rgba(255, 255, 255, .55));
+}
+
+.ait-cell:nth-child(1) {
+    left: 2.3%;
+    top: 16.0%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(2) {
+    left: 2.3%;
+    top: 33.3%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(3) {
+    left: 2.3%;
+    top: 50.5%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(4) {
+    left: 2.3%;
+    top: 67.7%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(5) {
+    right: 2.45%;
+    top: 16.0%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(6) {
+    right: 2.45%;
+    top: 33.4%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(7) {
+    right: 2.45%;
+    top: 50.8%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell:nth-child(8) {
+    right: 2.45%;
+    top: 68.0%;
+    width: 14.1%;
+    height: 15.6%;
+}
+
+.ait-cell-icon {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    width: 54%;
+    height: 64%;
+    transform: translate(-50%, -50%) rotate(var(--gesture-rotation, 0deg));
+    transform-origin: center;
+    filter: drop-shadow(0 4px 0 rgba(0, 0, 0, .2));
+    display: none;
+}
+
+.gesture-1-up,
+.gesture-1-down,
+.gesture-1-left,
+.gesture-1-right {
+    background-image: url('../assets/aitrainer/hand-one.svg');
+}
+
+.gesture-2-up,
+.gesture-2-down,
+.gesture-2-left,
+.gesture-2-right {
+    background-image: url('../assets/aitrainer/hand-two.svg');
+}
+
+.gesture-1-down,
+.gesture-2-down {
+    --gesture-rotation: 180deg;
+}
+
+.gesture-1-left,
+.gesture-2-left {
+    --gesture-rotation: -90deg;
+}
+
+.gesture-1-right,
+.gesture-2-right {
+    --gesture-rotation: 90deg;
+}
+
+.hand-palm,
+.finger,
+.hand-thumb {
+    display: none;
+}
+
+.hand-palm {
+    left: 34%;
+    bottom: 8%;
+    width: 32%;
+    height: 36%;
+    border-radius: 46% 46% 36% 36%;
+}
+
+.finger {
+    bottom: 40%;
+    width: 16%;
+    height: 50%;
+    border-radius: 999px;
+}
+
+.gesture-1-up .finger-a,
+.gesture-1-down .finger-a,
+.gesture-1-left .finger-a,
+.gesture-1-right .finger-a {
+    left: 42%;
+}
+
+.gesture-1-up .finger-b,
+.gesture-1-down .finger-b,
+.gesture-1-left .finger-b,
+.gesture-1-right .finger-b {
+    display: none;
+}
+
+.gesture-2-up .finger-a,
+.gesture-2-down .finger-a,
+.gesture-2-left .finger-a,
+.gesture-2-right .finger-a {
+    left: 34%;
+}
+
+.gesture-2-up .finger-b,
+.gesture-2-down .finger-b,
+.gesture-2-left .finger-b,
+.gesture-2-right .finger-b {
+    left: 51%;
+}
+
+.hand-thumb {
+    left: 23%;
+    bottom: 24%;
+    width: 28%;
+    height: 15%;
+    border-radius: 999px;
+    transform: rotate(-28deg);
+    transform-origin: right center;
+}
+
+.ait-cell-meter {
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    bottom: 9%;
+    height: 7%;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .42);
+    overflow: hidden;
+}
+
+.ait-cell-meter span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: #00bcd4;
+}
+
+.ait-actions {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+}
+
+.ait-actions button {
+    pointer-events: auto;
+}
+
+.ait-actions button:hover,
+.ait-back-hit:hover,
+.ait-camera-hit:hover,
+.ait-next-hit:hover,
+.ait-reset-hit:hover {
+    box-shadow: inset 0 0 0 5px rgba(255, 255, 255, .55);
+}
+
+.action-collect {
+    left: 33.2%;
+    top: 87.8%;
+    width: 7.6%;
+    height: 10.4%;
+}
+
+.action-stop {
+    left: 41.7%;
+    top: 87.8%;
+    width: 7.6%;
+    height: 10.4%;
+}
+
+.action-test {
+    left: 50.5%;
+    top: 87.8%;
+    width: 7.6%;
+    height: 10.4%;
+}
+
+.action-save {
+    left: 59.0%;
+    top: 87.8%;
+    width: 7.6%;
+    height: 10.4%;
+}
+
+.ait-progress,
+.ait-result {
+    position: absolute;
+    z-index: 7;
+    left: 50%;
+    bottom: 18%;
+    width: 19%;
+    min-height: 3.2%;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: rgba(255, 247, 206, .92);
+    box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .08);
+    display: none;
+}
+
+.ait-progress:before {
+    content: "";
+    position: absolute;
+    left: 5%;
+    top: 30%;
+    width: var(--progress, 0);
+    max-width: 90%;
+    height: 40%;
+    border-radius: 999px;
+    background: #00bcd4;
+}
+
+.ait-result {
+    width: 5%;
+    min-height: 8%;
+    bottom: 20%;
+    background: #fff7ce;
+}
+
+.ait-result:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 30%;
+    height: 16%;
+    border-left: 7px solid #287f46;
+    border-bottom: 7px solid #287f46;
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.result-empty:before {
+    width: 42%;
+    height: 0;
+    border-left: 0;
+    border-bottom: 7px solid #d62222;
+    transform: translate(-50%, -50%) rotate(45deg);
+    box-shadow: 0 0 0 #d62222;
+}
+
+@keyframes ait-camera-pulse {
+    from {
+        box-shadow: 0 6px 0 rgba(0, 0, 0, .16), 0 0 0 0 rgba(255, 190, 87, .15);
+    }
+
+    to {
+        box-shadow: 0 6px 0 rgba(0, 0, 0, .16), 0 0 0 8px rgba(255, 190, 87, .35);
+    }
+}
+
+@keyframes ait-selected-pulse {
+    from {
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .65);
+    }
+
+    to {
+        box-shadow: 0 0 0 8px rgba(255, 255, 255, .9);
+    }
+}

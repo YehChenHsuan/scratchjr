@@ -4,6 +4,7 @@ import InitialOptions from '../utils/InitialOptions';
 import OS from '../tablet/OS';
 import IO from '../tablet/IO';
 import MediaLib from '../tablet/MediaLib';
+import {registerPWA, requestPersistentStorage} from '../utils/PWA';
 
 import {indexMain} from './index';
 import {homeMain} from './home';
@@ -21,6 +22,8 @@ function loadSettings (settingsRoot, whenDone) {
 
 // App-wide entry-point
 window.onload = () => {
+    registerPWA();
+    requestPersistentStorage();
     // Function to be called after settings, locale strings, and Media Lib
     // are asynchronously loaded. This is overwritten per HTML page below.
     let entryFunction = () => {};

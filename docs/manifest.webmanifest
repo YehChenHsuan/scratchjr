@@ -1,0 +1,17 @@
+{
+  "name": "ScratchJr AI",
+  "short_name": "ScratchJr AI",
+  "description": "適合兒童的圖像式程式設計與 AI 手勢學習工具",
+  "lang": "zh-TW",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#ffe75a",
+  "theme_color": "#00bcd4",
+  "icons": [
+    {"src": "assets/pwa/app-icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "assets/pwa/app-icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "assets/pwa/app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

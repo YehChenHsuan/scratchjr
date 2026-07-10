@@ -228,6 +228,18 @@ export default class OS {
         tabletInterface.createZipForProject(projectData, metadata, name, fcn);
     }
 
+    static supportsProjectImport () {
+        return typeof tabletInterface.importProjectArchive === 'function';
+    }
+
+    static importProjectArchive (file, fcn) {
+        if (!OS.supportsProjectImport()) {
+            if (fcn) fcn('');
+            return;
+        }
+        tabletInterface.importProjectArchive(file, fcn);
+    }
+
 
     // Called on the JS side to trigger native UI for project sharing.
     // fileName: name for the file to share

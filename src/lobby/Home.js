@@ -41,6 +41,14 @@ export default class Home {
         tb.id = 'newproject';
     }
 
+    static importProjectThumbnail (parent) {
+        if (!OS.supportsProjectImport()) return;
+        var tb = newHTML('div', 'projectthumb', parent);
+        var icon = newHTML('div', 'aproject importproject', tb);
+        icon.setAttribute('aria-label', Localization.localizeOptional('匯入作品'));
+        tb.id = 'importproject';
+    }
+
     //////////////////////////
     // Events
     //////////////////////////
@@ -141,6 +149,10 @@ export default class Home {
             return;
         }
         var md5 = Home.actionTarget.id;
+        if (md5 == 'importproject') {
+            Home.importProject();
+            return;
+        }
         switch (Home.getAction(e)) {
         case 'project':
             ScratchAudio.sndFX('keydown.wav');
@@ -262,6 +274,7 @@ export default class Home {
             div.removeChild(div.childNodes[0]);
         }
         Home.emptyProjectThumbnail(div);
+        Home.importProjectThumbnail(div);
         for (var i = 0; i < data.length; i++) {
             Home.addProjectLink(div, data[i]);
         }
@@ -271,6 +284,22 @@ export default class Home {
         if (gn('wrapc')) {
             gn('wrapc').scrollTop = scrollvalue;
         }
+    }
+
+    static importProject () {
+        var picker = document.createElement('input');
+        picker.type = 'file';
+        picker.accept = '.sjr,.zip,application/zip';
+        picker.onchange = function () {
+            var file = picker.files && picker.files[0];
+            if (!file) return;
+            OS.importProjectArchive(file, function (projectId) {
+                if (projectId) {
+                    Home.displayYourProjects();
+                }
+            });
+        };
+        picker.click();
     }
 
     static addProjectLink (parent, aa) {

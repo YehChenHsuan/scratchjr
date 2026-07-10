@@ -52,13 +52,19 @@ export default class MediaLib {
     static localizeMediaNames () {
         // Localize names of sprites
         for (let i = 0; i < sprites.length; i++) {
-            sprites[i].name = Localization.localize('CHARACTER_' + sprites[i].md5);
+            MediaLib.localizeMediaName(sprites[i], 'CHARACTER_');
         }
 
         // Localize names of backgrounds
         for (let i = 0; i < backgrounds.length; i++) {
-            backgrounds[i].name = Localization.localize('BACKGROUND_' + backgrounds[i].md5);
+            MediaLib.localizeMediaName(backgrounds[i], 'BACKGROUND_');
         }
+    }
+
+    static localizeMediaName (media, legacyPrefix) {
+        const fallback = media.name || media.md5;
+        const key = media.nameKey || (legacyPrefix + media.md5);
+        media.name = Localization.hasKey(key) ? Localization.localize(key) : fallback;
     }
 
     static generateKeys () {
