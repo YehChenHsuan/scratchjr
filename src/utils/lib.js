@@ -294,9 +294,16 @@ export function localx (el, gx) {
 export function globalx (el) {
     var lx = 0;
     while (el && el.offsetLeft != undefined) {
-        var webkitTransform = new WebKitCSSMatrix(window.getComputedStyle(el).webkitTransform);
+        var computedStyle = window.getComputedStyle(el);
+        var webkitTransform = new WebKitCSSMatrix(computedStyle.webkitTransform);
         var transformScale = webkitTransform.m11;
-        lx += (el.clientWidth - (transformScale * el.clientWidth)) / 2;
+        // The center-origin compensation below only applies when the element
+        // scales around its center (the CSS default). Elements using
+        // transform-origin: 0 0 (e.g. the fixed-viewport #frame) don't shift
+        // their top-left corner when scaled, so no compensation is needed.
+        if (computedStyle.webkitTransformOrigin.indexOf('0px 0px') !== 0) {
+            lx += (el.clientWidth - (transformScale * el.clientWidth)) / 2;
+        }
         var transformX = webkitTransform.m41;
         lx += transformX;
         lx += el.offsetLeft + el.clientLeft;
@@ -317,9 +324,13 @@ export function localy (el, gy) {
 export function globaly (el) {
     var ly = 0;
     while (el && el.offsetTop != undefined) {
-        var webkitTransform = new WebKitCSSMatrix(window.getComputedStyle(el).webkitTransform);
+        var computedStyle = window.getComputedStyle(el);
+        var webkitTransform = new WebKitCSSMatrix(computedStyle.webkitTransform);
         var transformScale = webkitTransform.m22;
-        ly += (el.clientHeight - (transformScale * el.clientHeight)) / 2;
+        // See matching comment in globalx() above.
+        if (computedStyle.webkitTransformOrigin.indexOf('0px 0px') !== 0) {
+            ly += (el.clientHeight - (transformScale * el.clientHeight)) / 2;
+        }
         var transformY = webkitTransform.m42;
         ly += transformY;
         ly += el.offsetTop + el.clientTop;

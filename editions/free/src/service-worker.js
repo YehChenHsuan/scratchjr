@@ -17,23 +17,39 @@ self.addEventListener('activate', event => {
         .then(() => self.clients.claim()));
 });
 
+// App code (HTML shell + JS bundle) must always be fetched from the network
+// first so a rebuilt app.bundle.js is picked up immediately - falling back to
+// cache only when offline. Everything else (images, sounds, etc.) is safe to
+// serve cache-first since those assets don't change without also changing
+// their filename/md5.
+function isAppCode (url) {
+    return url.pathname.endsWith('/index.html') || url.pathname.endsWith('/aitrainer.html') ||
+        url.pathname.endsWith('/app.bundle.js') || url.pathname.endsWith('/');
+}
+
 self.addEventListener('fetch', event => {
     const request = event.request;
     if (request.method !== 'GET') return;
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return;
 
-    event.respondWith(caches.match(request, {ignoreSearch: request.mode === 'navigate'})
+    if (isAppCode(url) || request.mode === 'navigate') {
+        event.respondWith(fetch(request).then(response => {
+            if (!response || response.status !== 200) return response;
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+            return response;
+        }).catch(() => caches.match(request, {ignoreSearch: true})
+            .then(cached => cached || caches.match('./index.html'))));
+        return;
+    }
+
+    event.respondWith(caches.match(request)
         .then(cached => cached || fetch(request).then(response => {
             if (!response || response.status !== 200) return response;
             const copy = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
             return response;
-        }).catch(() => {
-            if (request.mode === 'navigate') {
-                return caches.match('./index.html');
-            }
-            return new Response('', {status: 503, statusText: 'Offline'});
-        })));
+        }).catch(() => new Response('', {status: 503, statusText: 'Offline'}))));
 });
 
