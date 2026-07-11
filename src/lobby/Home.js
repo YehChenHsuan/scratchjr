@@ -209,10 +209,14 @@ export default class Home {
         var pn = [];
         var div = gn('scrollarea');
         for (var i = 0; i < div.childElementCount; i++) {
-            if (div.childNodes[i].id == 'newproject') {
+            var projectTile = div.children[i];
+            if (!projectTile || projectTile.id == 'newproject' || projectTile.id == 'importproject') {
                 continue;
             }
-            pn.push(div.childNodes[i].childNodes[1].childNodes[0].textContent);
+            var title = projectTile.querySelector('.projecttitle');
+            if (title) {
+                pn.push(title.textContent);
+            }
         }
         var n = 1;
         while (pn.indexOf(name + ' ' + n) > -1) {

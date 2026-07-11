@@ -13,6 +13,7 @@ const BUNDLE = path.join(ROOT, 'src', 'build', 'bundles', 'app.bundle.js');
 function isPreservedDoc (p) {
     const resolved = path.resolve(p);
     return resolved === path.resolve(path.join(OUT, 'adr')) ||
+        resolved === path.resolve(path.join(OUT, 'ui-audit')) ||
         (path.dirname(resolved) === path.resolve(OUT) && path.extname(resolved).toLowerCase() === '.md');
 }
 
