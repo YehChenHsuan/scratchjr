@@ -1,4 +1,4 @@
-self.__SCRATCHJR_PRECACHE_VERSION="db83103e4cc68edc";
+self.__SCRATCHJR_PRECACHE_VERSION="dcb7fa31fbfd5032";
 self.__SCRATCHJR_PRECACHE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
@@ -209,12 +209,12 @@ self.__SCRATCHJR_PRECACHE_URLS=[
   "./assets/pwa/app-icon-master.svg",
   "./assets/pwa/apple-touch-icon.png",
   "./assets/pwa/favicon.png",
-  "./assets/start/Cat.svg",
   "./assets/start/FunkyBlue.svg",
   "./assets/start/FunkyPurple.svg",
   "./assets/start/FunkyRed.svg",
   "./assets/start/ScratchJrLogo.svg",
   "./assets/start/bottom.png",
+  "./assets/start/cat.svg",
   "./assets/start/creditsText.png",
   "./assets/start/helpOff.svg",
   "./assets/start/helpOn.svg",
@@ -301,6 +301,7 @@ self.__SCRATCHJR_PRECACHE_URLS=[
   "./css/editorleftpanel.css",
   "./css/editormodal.css",
   "./css/editorstage.css",
+  "./css/fixedviewport.css",
   "./css/font.css",
   "./css/gs.css",
   "./css/librarymodal.css",

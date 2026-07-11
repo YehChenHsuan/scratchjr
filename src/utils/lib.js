@@ -3,8 +3,8 @@ export var frame;
 // There are references to it throughout the codebase, should possibly be removed at some point
 export const isTablet = ('ontouchstart' in document.documentElement);
 export const DEGTOR = Math.PI / 180;
-export const WINDOW_INNER_HEIGHT = window.innerHeight;
-export const WINDOW_INNER_WIDTH = window.innerWidth;
+export const WINDOW_INNER_HEIGHT = 720;
+export const WINDOW_INNER_WIDTH = 1280;
 export const scaleMultiplier = WINDOW_INNER_HEIGHT / 768.0;
 export const fullscreenScaleMultiplier = 136;
 

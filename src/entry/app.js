@@ -5,6 +5,7 @@ import OS from '../tablet/OS';
 import IO from '../tablet/IO';
 import MediaLib from '../tablet/MediaLib';
 import {registerPWA, requestPersistentStorage} from '../utils/PWA';
+import {initializeFixedViewport} from '../utils/FixedViewport';
 
 import {indexMain} from './index';
 import {homeMain} from './home';
@@ -22,6 +23,7 @@ function loadSettings (settingsRoot, whenDone) {
 
 // App-wide entry-point
 window.onload = () => {
+    initializeFixedViewport();
     registerPWA();
     requestPersistentStorage();
     // Function to be called after settings, locale strings, and Media Lib
@@ -34,6 +36,8 @@ window.onload = () => {
 
     // scratchJrPage is defined in the HTML pages
     let page = window.scratchJrPage;
+
+    preprocessAndLoadCss('css', 'css/fixedviewport.css');
 
     // Load CSS and set root/entryFunction for all pages
     switch (page) {

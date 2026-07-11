@@ -81,3 +81,30 @@ flowchart TD
 - Camera content and landmark alignment still require a physical-device camera test.
 - Android and iPad portrait/landscape acceptance remains a separate physical-device check.
 
+## Fixed Canvas Scaling
+
+The application uses a fixed `1280 x 720` design canvas. Landscape windows scale the complete canvas with one uniform factor; internal controls do not reflow independently.
+
+| Viewport | Scale | Rendered canvas | Result |
+|---|---:|---:|---|
+| 1280 x 720 | 1.00 | 1280 x 720 | PASS |
+| 960 x 600 | 0.75 | 960 x 540, vertically centered | PASS |
+| 1600 x 900 | 1.25 | 1600 x 900 | PASS |
+| 600 x 960 | 0.46875 | Hidden by rotate-device prompt | PASS |
+
+The New Project tile remained clickable at `960 x 600` and navigated to `editor.html?pmd5=1&mode=edit`. The AI trainer root and stage both rendered at `960 x 540`, preserving hotspot alignment.
+
+### 11 Fixed Canvas At 1280 x 720
+![Fixed canvas 1280 x 720](screenshots/11-fixed-1280x720.png)
+
+### 12 Fixed Canvas At 960 x 600
+![Fixed canvas 960 x 600](screenshots/12-fixed-960x600.png)
+
+### 13 Fixed Canvas At 1600 x 900
+![Fixed canvas 1600 x 900](screenshots/13-fixed-1600x900.png)
+
+### 14 AI Trainer At 960 x 600
+![AI trainer fixed canvas](screenshots/14-trainer-fixed-960x600.png)
+
+### 15 Portrait Rotation Prompt
+![Portrait rotation prompt](screenshots/15-portrait-rotate-prompt.png)
