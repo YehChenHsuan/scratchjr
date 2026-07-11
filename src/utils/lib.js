@@ -284,8 +284,15 @@ export function setCanvasSizeScaledToWindowDocumentHeight (c, w, h) {
 export function localx (el, gx) {
     var lx = gx;
     while (el && el.offsetTop != undefined) {
-        lx -= el.offsetLeft + el.clientLeft +
-            (new WebKitCSSMatrix(window.getComputedStyle(el).webkitTransform)).m41;
+        var computedStyle = window.getComputedStyle(el);
+        var webkitTransform = new WebKitCSSMatrix(computedStyle.webkitTransform);
+        var isTopLeftOrigin = computedStyle.webkitTransformOrigin.indexOf('0px 0px') === 0;
+        // The fixed-viewport transform is excluded because pointer coordinates
+        // are already in design space (see globalx).
+        lx -= el.offsetLeft + el.clientLeft;
+        if (!isTopLeftOrigin) {
+            lx -= webkitTransform.m41;
+        }
         el = el.parentNode;
     }
     return lx;
@@ -314,7 +321,15 @@ export function globalx (el) {
 export function localy (el, gy) {
     var ly = gy;
     while (el && el.offsetTop != undefined) {
-        ly -= el.offsetTop + el.clientTop + (new WebKitCSSMatrix(window.getComputedStyle(el).webkitTransform)).m42;
+        var computedStyle = window.getComputedStyle(el);
+        var webkitTransform = new WebKitCSSMatrix(computedStyle.webkitTransform);
+        var isTopLeftOrigin = computedStyle.webkitTransformOrigin.indexOf('0px 0px') === 0;
+        // The fixed-viewport transform is excluded because pointer coordinates
+        // are already in design space (see globalx).
+        ly -= el.offsetTop + el.clientTop;
+        if (!isTopLeftOrigin) {
+            ly -= webkitTransform.m42;
+        }
         el = el.parentNode;
     }
     return ly;
