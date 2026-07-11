@@ -119,7 +119,7 @@ export default class IO {
         function loadInnerImages (str, whenDone) {
             var xmlDoc = new DOMParser().parseFromString(str, 'text/xml');
             var extxml = document.importNode(xmlDoc.documentElement, true);
-            if (extxml.childNodes[0].nodeName == '#comment') {
+            if (extxml.childNodes[0] && extxml.childNodes[0].nodeName == '#comment') {
                 extxml.removeChild(extxml.childNodes[0]);
             }
             var images = IO.getImages(extxml, []);

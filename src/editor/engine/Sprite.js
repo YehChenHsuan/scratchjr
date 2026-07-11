@@ -97,9 +97,9 @@ export default class Sprite {
     }
 
     setSVG (str) {
-        var xmlDoc = new DOMParser().parseFromString(str, 'text/xml');
+        var xmlDoc = new DOMParser().parseFromString(str || '<svg xmlns="http://www.w3.org/2000/svg"></svg>', 'text/xml');
         var extxml = document.importNode(xmlDoc.documentElement, true);
-        if (extxml.childNodes[0].nodeName == '#comment') {
+        if (extxml.childNodes[0] && extxml.childNodes[0].nodeName == '#comment') {
             extxml.removeChild(extxml.childNodes[0]);
         }
         this.svg = extxml;
@@ -125,6 +125,12 @@ export default class Sprite {
             img.onload = function () {
                 sprite.displaySprite(fcn);
             };
+            // Guards against a broken/missing asset (e.g. after a corrupted import)
+            // permanently hanging the load chain and leaving ScratchJr.onHold stuck,
+            // which freezes all dragging and button clicks in the editor.
+            img.onerror = function () {
+                sprite.displaySprite(fcn);
+            };
         } else {
             sprite.displaySprite(fcn);
         }
@@ -144,11 +150,18 @@ export default class Sprite {
     }
 
     doRender (whenDone) {
-        this.drawBorder(); // canvas draw border
-        this.render();
-        SVG2Canvas.drawInCanvas(this); // canvas draws mask for pixel detection
-        this.readOnly = SVG2Canvas.svgerror;
-        this.watermark = SVGTools.getWatermark(this.svg, '#B3B3B3'); // svg for watermark
+        // A malformed/missing asset (e.g. after a corrupted import) can throw here.
+        // Never let that leave whenDone() uncalled: callers rely on it to release
+        // ScratchJr.onHold, and skipping it freezes all dragging and clicks in the editor.
+        try {
+            this.drawBorder(); // canvas draw border
+            this.render();
+            SVG2Canvas.drawInCanvas(this); // canvas draws mask for pixel detection
+            this.readOnly = SVG2Canvas.svgerror;
+            this.watermark = SVGTools.getWatermark(this.svg, '#B3B3B3'); // svg for watermark
+        } catch (error) {
+            console.error('[Sprite.doRender] failed to render sprite', this.id, error); //eslint-disable-line no-console
+        }
         if (whenDone) {
             whenDone(this);
         }
