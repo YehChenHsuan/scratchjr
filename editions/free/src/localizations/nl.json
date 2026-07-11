@@ -360,6 +360,7 @@
     "BLOCK_DESC_GO_TO_PAGE": "GA NAAR PAGINA {PAGE}",
     "SHARING_BY_EMAIL": "Deel via e-mailbericht",
     "SHARING_BY_AIRDROP": "Deel via Airdrop",
+    "SHARING_BY_DOWNLOAD": "Download to Device",
     "SHARING_EMAIL_SUBJECT": "ScratchJr-project: {PROJECT_NAME}",
     "SHARING_EMAIL_TEXT": "Klik op het icoontje om mijn ScratchJr-project uit te proberen op jouw iPad of Android-tablet!<br><br> Als je de ScratchJr-app niet hebt, dan kun je deze <a href='http://www.scratchjr.org'>downloaden </a> van de Apple App-store of de Google Play Store.<br><br>Met ScratchJr kunnen kinderen hun eigen interactieve verhalen en games maken. Ga voor meer informatie naar <a href='http://www.scratchjr.org'>scratchjr.org</a>.",
     "FOR_PARENTS": "Voor ouders",

@@ -360,6 +360,7 @@
     "BLOCK_DESC_GO_TO_PAGE": "MYND I DUDALEN {PAGE}",
     "SHARING_BY_EMAIL": "Rhannu drwy E-bost",
     "SHARING_BY_AIRDROP": "Rhannu drwy Airdrop",
+    "SHARING_BY_DOWNLOAD": "Download to Device",
     "SHARING_EMAIL_SUBJECT": "Project ScratchJr: {PROJECT_NAME}",
     "SHARING_EMAIL_TEXT": "Cliciwch yr eicon i brofi fy mhroject ScratchJr ar eich iPad neu dabled Android! <br><br>Os nad yw'r ap ScratchJr gennych, gallwch ei <a href='http://www.scratchjr.org'>lwytho i lawr </a>o'rApple Appstore neu Google Play Store. <br><br> Gyda ScratchJr, gall plant greu eu straeon rhyngweithiol a gemau eu hunain. I ddysgu rhagor, ewch i <a href='http://www.scratchjr.org'>ScratchJr</a>.",
     "FOR_PARENTS": "Ar Gyfer Rhieni",

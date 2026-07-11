@@ -360,6 +360,7 @@
     "BLOCK_DESC_GO_TO_PAGE": " {PAGE} SAYFASINA GİT",
     "SHARING_BY_EMAIL": "Eposta ile Paylaş",
     "SHARING_BY_AIRDROP": "Airdrop ile Paylaş",
+    "SHARING_BY_DOWNLOAD": "Download to Device",
     "SHARING_EMAIL_SUBJECT": "ScratchJr Projesi:  {PROJECT_NAME} ",
     "SHARING_EMAIL_TEXT": "ScratchJr projelerimi iPad'inizde veya Android tabletinizde denemek için ikona tıklayın!<br><br> Eğer ScratchJr uygulamasına sahip değil iseniz, Apple Uygulama Mağazası veya Google Oyun Mağazasından <a href='http://www.scratchjr.org'> indirin </a><br><br> ScratchJr kullanarak çocuklar kendi etkileşimli hikaye ve oyunlarını oluşturabilirler. Daha fazla bilgi için <a href='http://www.scratchjr.org'>scratchjr.org</a> sayfasını ziyaret edin.",
     "FOR_PARENTS": "Anne-Babalar için",

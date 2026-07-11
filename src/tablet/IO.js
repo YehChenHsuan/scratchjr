@@ -293,7 +293,7 @@ export default class IO {
     // Sharing
     ////////////////////
 
-    static compressProject (projectReference, finished) {
+    static compressProject (projectReference, finished, shareOptions) {
         IO.getObject(projectReference, function (projectFromDB) {
             var projectMetadata = {
                 'thumbnails': [],
@@ -387,6 +387,21 @@ export default class IO {
                 .replace(windowsReservedRe, '_')
                 .replace(windowsTrailingRe, '_');
             shareName = jsonData.name;
+
+            // Web + share-sheet requested (e.g. AirDrop on iPad Safari): use the OS-level
+            // share sheet instead of a direct file download.
+            if (shareOptions && shareOptions.useShareSheet && OS.canUseShareSheet()) {
+                OS.shareProjectFileOnWeb(
+                    JSON.stringify(jsonData),
+                    projectMetadata,
+                    zipFileName,
+                    shareOptions.emailSubject,
+                    function (name) {
+                        finished(name);
+                    }
+                );
+                return;
+            }
 
             // create zip natively
             OS.createZipForProject(JSON.stringify(jsonData), projectMetadata, zipFileName, function (name) {

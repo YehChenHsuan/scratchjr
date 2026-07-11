@@ -228,6 +228,17 @@ export default class OS {
         tabletInterface.createZipForProject(projectData, metadata, name, fcn);
     }
 
+    // Web-only: uses the OS-level share sheet (e.g. AirDrop on iPad Safari) when
+    // available, falling back to a direct download otherwise.
+    static shareProjectFileOnWeb (projectData, metadata, name, emailSubject, fcn) {
+        tabletInterface.shareProjectFile(projectData, metadata, name, emailSubject, fcn);
+    }
+
+    static canUseShareSheet () {
+        return isWeb && typeof tabletInterface.canUseShareSheet === 'function' &&
+            tabletInterface.canUseShareSheet();
+    }
+
     static supportsProjectImport () {
         return typeof tabletInterface.importProjectArchive === 'function';
     }

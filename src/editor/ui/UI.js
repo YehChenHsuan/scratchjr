@@ -21,7 +21,7 @@ import Events from '../../utils/Events';
 import Localization from '../../utils/Localization';
 import ScratchAudio from '../../utils/ScratchAudio';
 import {frame, gn, CSSTransition, localx, newHTML, scaleMultiplier, fullscreenScaleMultiplier,
-    getIdFor, isTablet, newDiv, newTextInput, isAndroid, getDocumentWidth, getDocumentHeight,
+    getIdFor, isTablet, newDiv, newTextInput, isAndroid, isWeb, getDocumentWidth, getDocumentHeight,
     setProps, globalx} from '../../utils/lib';
 
 let projectNameTextInput = null;
@@ -136,7 +136,11 @@ export default class UI {
 
             var shareEmail = newHTML('div', 'infoboxShareButton', shareButtons);
             shareEmail.id = 'infoboxShareButtonEmail';
-            shareEmail.textContent = Localization.localize('SHARING_BY_EMAIL');
+            // On web there's no native email/AirDrop bridge - the "email" button
+            // actually just downloads the .sjr file to the device, so label it as such.
+            shareEmail.textContent = isWeb ?
+                Localization.localizeOptional('SHARING_BY_DOWNLOAD', undefined) :
+                Localization.localize('SHARING_BY_EMAIL');
             shareEmail.onclick = function (e) {
                 UI.infoDoShare(e, nameField, shareLoadingGif, EMAILSHARE);
             };
@@ -147,7 +151,12 @@ export default class UI {
                 shareEmail.style.float = 'left';
             }
 
-            if (!isAndroid) {
+            // AirDrop button: shown on native iOS always, and on web only when the
+            // browser exposes a real OS-level share sheet (e.g. Safari on iPad) that
+            // can actually offer AirDrop - otherwise it would just be a second,
+            // misleading "download" button.
+            var showAirdropButton = !isAndroid && (!isWeb || OS.canUseShareSheet());
+            if (showAirdropButton) {
                 var shareAirdrop = newHTML('div', 'infoboxShareButton', shareButtons);
                 shareAirdrop.id = 'infoboxShareButtonAirdrop';
                 shareAirdrop.textContent = Localization.localize('SHARING_BY_AIRDROP');
@@ -270,21 +279,34 @@ export default class UI {
             Project.prepareToSave(ScratchJr.currentProject, function () {
                 Alert.close();
 
+                // On web, AirDrop only makes sense via the browser's native share
+                // sheet; route straight to it instead of a plain download.
+                var useShareSheet = isWeb && shareType == AIRDROPSHARE && OS.canUseShareSheet();
+                var shareOptions = useShareSheet ? {
+                    useShareSheet: true,
+                    emailSubject: nameField.value ?
+                        Localization.localize('SHARING_EMAIL_SUBJECT', {PROJECT_NAME: nameField.value}) :
+                        undefined
+                } : undefined;
+
                 // Package the project as a .sjr file
                 IO.compressProject(ScratchJr.currentProject, function (fullName) {
                     ScratchJr.onHold = false; // Unfreeze the editing UI
-                    var emailSubject = Localization.localize('SHARING_EMAIL_SUBJECT', {
-                        PROJECT_NAME: IO.shareName
-                    });
-                    OS.sendSjrToShareDialog(
-                        fullName,
-                        emailSubject,
-                        Localization.localize('SHARING_EMAIL_TEXT'),
-                        shareType
-                    );
+
+                    if (!useShareSheet) {
+                        var emailSubject = Localization.localize('SHARING_EMAIL_SUBJECT', {
+                            PROJECT_NAME: IO.shareName
+                        });
+                        OS.sendSjrToShareDialog(
+                            fullName,
+                            emailSubject,
+                            Localization.localize('SHARING_EMAIL_TEXT'),
+                            shareType
+                        );
+                    }
 
                     shareLoadingGif.style.visibility = 'hidden';
-                });
+                }, shareOptions);
             });
         }
     }

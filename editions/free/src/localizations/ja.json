@@ -360,6 +360,7 @@
     "BLOCK_DESC_GO_TO_PAGE": "{PAGE}ぺーじへすすむ",
     "SHARING_BY_EMAIL": "Eめーるで きょうゆうする",
     "SHARING_BY_AIRDROP": "えあどろっぷで きょうゆうする",
+    "SHARING_BY_DOWNLOAD": "Download to Device",
     "SHARING_EMAIL_SUBJECT": "すくらっちじゅにあ ぷろじぇくと： {PROJECT_NAME}",
     "SHARING_EMAIL_TEXT": "アイコンをクリックして、あなたのiPadやアンドロイドタブレットでスクラッチジュニアアプリを試してみよう。<br><br>もしスクラッチジュニアアプリを持っていなければ、Apple App storeかGoogle Play Storeから <a href='http://www.scratchjr.org'>ダウンロード</a> できます。<br><br>子供達はスクラッチジュニアで自分自身で対話型の物語やゲームを作ることができます。詳しくは  <a href='http://www.scratchjr.org'>scratchjr.org</a>を見てください。",
     "FOR_PARENTS": "保護者の方へ",

@@ -491,13 +491,14 @@ export default class Web {
     }
 
     // ---- Share & misc -----------------------------------------------------
-    static createZipForProject (projectData, metadata, name, fcn) {
+    // Builds the .sjr zip blob for a project. Resolves with {blob, fileName}.
+    static buildProjectZipBlob (projectData, name) {
         const safeName = (name || 'ScratchJrProject').replace(/[^a-z0-9_-]/gi, '_');
         const zip = new JSZip();
         const project = zip.folder('project');
         project.file('data.json', projectData);
 
-        Promise.all([
+        return Promise.all([
             allRecords(STORE_MEDIA),
             allRecords(STORE_USERSHAPES),
             allRecords(STORE_USERBKGS)
@@ -518,18 +519,66 @@ export default class Web {
             }
             project.file('backup.json', JSON.stringify({format: 'scratchjr-web-backup', version: 1}));
             return zip.generateAsync({type: 'blob', compression: 'DEFLATE'});
-        }).then(blob => {
+        }).then(blob => ({blob, fileName: safeName + '.sjr'}));
+    }
+
+    static createZipForProject (projectData, metadata, name, fcn) {
+        Web.buildProjectZipBlob(projectData, name).then(({blob, fileName}) => {
             const a = document.createElement('a');
             const url = URL.createObjectURL(blob);
             a.href = url;
-            a.download = safeName + '.sjr';
+            a.download = fileName;
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            cb(fcn, safeName + '.sjr');
+            cb(fcn, fileName);
         }).catch(error => {
             console.error('[Web.createZipForProject]', error);
             cb(fcn, 'error');
         });
+    }
+
+    // Uses the OS-level share sheet (AirDrop, Mail, Messages, etc. on iPad Safari)
+    // when the Web Share API with file support is available; otherwise falls back
+    // to a plain download, same as createZipForProject.
+    static shareProjectFile (projectData, metadata, name, emailSubject, fcn) {
+        Web.buildProjectZipBlob(projectData, name).then(async ({blob, fileName}) => {
+            const file = new File([blob], fileName, {type: 'application/zip'});
+            const canShareFiles = typeof navigator.canShare === 'function' &&
+                navigator.canShare({files: [file]});
+
+            if (canShareFiles) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: emailSubject || fileName
+                    });
+                    cb(fcn, fileName);
+                    return;
+                } catch (error) {
+                    // User cancelled the share sheet, or share failed - fall back to download.
+                    if (error && error.name === 'AbortError') {
+                        cb(fcn, 'cancelled');
+                        return;
+                    }
+                }
+            }
+
+            const a = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            cb(fcn, fileName);
+        }).catch(error => {
+            console.error('[Web.shareProjectFile]', error);
+            cb(fcn, 'error');
+        });
+    }
+
+    static canUseShareSheet () {
+        return typeof navigator !== 'undefined' && typeof navigator.share === 'function' &&
+            typeof navigator.canShare === 'function';
     }
 
     static importProjectArchive (file, fcn) {
