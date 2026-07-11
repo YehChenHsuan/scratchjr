@@ -1,5 +1,5 @@
-self.__SCRATCHJR_PRECACHE_VERSION="0e4010eaedc9fdea";
-self.__SCRATCHJR_PRECACHE_URLS=[
+self.__SCRATCHJR_PRECACHE_VERSION="c889b17e065f88f8";
+self.__SCRATCHJR_CORE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
   "./assets/aitrainer/gesture-trainer-canva.svg",
@@ -393,7 +393,9 @@ self.__SCRATCHJR_PRECACHE_URLS=[
   "./sounds/splash.wav",
   "./sounds/tap.wav",
   "./svglibrary/Farm.svg",
-  "./svglibrary/Star.svg",
+  "./svglibrary/Star.svg"
+];
+self.__SCRATCHJR_AI_URLS=[
   "./vendor/ai/knn/knn-classifier.min.js",
   "./vendor/ai/mediapipe/hand_landmark_full.tflite",
   "./vendor/ai/mediapipe/hands.binarypb",

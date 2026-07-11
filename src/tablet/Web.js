@@ -517,7 +517,11 @@ export default class Web {
             if (gesture && gesture.payload) {
                 project.file('gestures/model.json', JSON.stringify(gesture.payload));
             }
-            project.file('backup.json', JSON.stringify({format: 'scratchjr-web-backup', version: 1}));
+            project.file('backup.json', JSON.stringify({
+                format: 'scratchjr-web-backup',
+                version: 1,
+                createdAt: new Date().toISOString()
+            }));
             return zip.generateAsync({type: 'blob', compression: 'DEFLATE'});
         }).then(blob => ({blob, fileName: safeName + '.sjr'}));
     }
@@ -529,6 +533,11 @@ export default class Web {
             a.href = url;
             a.download = fileName;
             a.click();
+            window.localStorage.setItem('scratchjr_last_backup', JSON.stringify({
+                fileName,
+                createdAt: new Date().toISOString(),
+                size: blob.size
+            }));
             setTimeout(() => URL.revokeObjectURL(url), 1000);
             cb(fcn, fileName);
         }).catch(error => {

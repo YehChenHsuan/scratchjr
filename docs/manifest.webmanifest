@@ -1,7 +1,7 @@
 {
   "name": "ScratchJr AI",
   "short_name": "ScratchJr AI",
-  "description": "適合兒童的圖像式程式設計與 AI 手勢學習工具",
+  "description": "保留 ScratchJr 圖像式程式設計精神，加入離線 AI 手勢學習功能。",
   "lang": "zh-TW",
   "start_url": "./index.html",
   "scope": "./",

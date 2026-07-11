@@ -12,6 +12,12 @@ Baseline: `b35cc40`
 - Browser console: home page had no errors; AI page only reported a development-server WASM MIME fallback warning and completed ArrayBuffer loading.
 - `git diff --check`: no whitespace errors.
 - codebase-memory-mcp: moderate index refreshed and ADR 0001 recorded.
+- PWA manifest is valid UTF-8 Traditional Chinese JSON.
+- PWA cache is split into 394 core files and 18 AI files; all 412 URLs returned HTTP success.
+- AI background caching is limited to three concurrent requests and records progress locally.
+- `npm run verify:pwa` confirms critical offline files and exact `src` to `docs` deployment consistency.
+- `npm run verify:ui` validates fixed-canvas scale expectations and five nonblank regression screenshots.
+- Persistent-storage usage/quota and the latest project-backup metadata are recorded locally.
 
 ## Pending External Acceptance
 
@@ -20,4 +26,3 @@ Baseline: `b35cc40`
 - Verify camera permission, AI training, recognition and persistence after device restart.
 - Verify offline cold start after installation on each target browser.
 - Verify update retention and complete `.sjr` export-delete-import recovery with a representative child project.
-

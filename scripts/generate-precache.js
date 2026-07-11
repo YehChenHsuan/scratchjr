@@ -27,9 +27,12 @@ files.forEach(file => {
     hash.update(fs.readFileSync(path.join(SOURCE, file)));
 });
 const version = hash.digest('hex').slice(0, 16);
-const urls = files.map(file => './' + file);
+const aiFiles = files.filter(file => file.indexOf('vendor/ai/') === 0);
+const coreFiles = files.filter(file => file.indexOf('vendor/ai/') !== 0);
+const coreUrls = coreFiles.map(file => './' + file);
+const aiUrls = aiFiles.map(file => './' + file);
 const output = `self.__SCRATCHJR_PRECACHE_VERSION=${JSON.stringify(version)};\n` +
-    `self.__SCRATCHJR_PRECACHE_URLS=${JSON.stringify(urls, null, 2)};\n`;
+    `self.__SCRATCHJR_CORE_URLS=${JSON.stringify(coreUrls, null, 2)};\n` +
+    `self.__SCRATCHJR_AI_URLS=${JSON.stringify(aiUrls, null, 2)};\n`;
 fs.writeFileSync(OUTPUT, output);
-console.log(`Generated precache manifest ${version} with ${urls.length} files`);
-
+console.log(`Generated precache manifest ${version}: ${coreUrls.length} core, ${aiUrls.length} AI files`);

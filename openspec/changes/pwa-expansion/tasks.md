@@ -11,3 +11,6 @@
 - [x] Export and import complete `.sjr` archives on Web.
 - [ ] Pass desktop, Android tablet, iPad, offline, and upgrade acceptance tests.
 - [x] Refresh codebase-memory-mcp and record automated verification evidence.
+- [x] Split core and AI caches, add bounded background AI prefetch and update handling.
+- [x] Add build-source, manifest, offline-resource and fixed-layout verification scripts.
+- [x] Record storage estimate, persistence result and latest backup metadata locally.

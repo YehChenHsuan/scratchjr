@@ -11,6 +11,9 @@
     "fetch:ai-model": "node scripts/fetch-mobilenet-model.js",
     "icons:pwa": "node scripts/generate-pwa-icons.js",
     "precache": "node scripts/generate-precache.js",
+    "verify:pwa": "node scripts/verify-pwa.js",
+    "verify:ui": "node scripts/verify-ui-layout.js",
+    "test:pwa": "npm run build:web && npm run verify:pwa && npm run verify:ui",
     "build:web": "npm run sync:ai && npm run icons:pwa && node scripts/build-web.js",
     "serve": "node scripts/serve.js"
   },
