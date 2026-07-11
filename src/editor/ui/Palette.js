@@ -445,16 +445,31 @@ export default class Palette {
             var trained = GESTURE_DEFS
                 .map(def => def.id)
                 .filter(id => gestures.indexOf(id) > -1);
+            var blockDivs = [];
             for (var i = 0; i < trained.length; i++) {
                 var bbx = new Block(BlockSpecs.getGestureSpec(trained[i]), true, blockscale);
                 setProps(bbx.div.style, {
                     position: 'absolute',
-                    left: dx + 'px',
                     top: blockdy + 'px'
                 });
                 pal.appendChild(bbx.div);
                 bbx.lift();
-                dx += betweenblocks;
+                blockDivs.push(bbx.div);
+            }
+            var palWidth = pal.offsetWidth;
+            var blockWidth = (blockDivs[0] && blockDivs[0].offsetWidth) || Math.round(86 * blockscale);
+            var startDx = dx;
+            var rightPad = 6;
+            if (trained.length > 0) {
+                var spacing = betweenblocks;
+                var needed = startDx + (trained.length - 1) * spacing + blockWidth + rightPad;
+                if (needed > palWidth) {
+                    spacing = Math.max(blockWidth * 0.55,
+                        (palWidth - startDx - blockWidth - rightPad) / Math.max(1, trained.length - 1));
+                }
+                for (var j = 0; j < blockDivs.length; j++) {
+                    blockDivs[j].style.left = startDx + j * spacing + 'px';
+                }
             }
         });
     }

@@ -513,6 +513,16 @@ export default class ScratchJr {
             gestureOverlay = document.createElement('canvas');
             gesturePreview.appendChild(gestureVideo);
             gesturePreview.appendChild(gestureOverlay);
+            var closeBtn = document.createElement('div');
+            closeBtn.className = 'gesture-camera-close';
+            closeBtn.setAttribute('aria-label', 'Close camera preview');
+            closeBtn.textContent = '×';
+            closeBtn.onmousedown = closeBtn.ontouchstart = function (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+                gesturePreview.style.display = 'none';
+            };
+            gesturePreview.appendChild(closeBtn);
             document.body.appendChild(gesturePreview);
         }
         gesturePreview.style.display = 'block';
