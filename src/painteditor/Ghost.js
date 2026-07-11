@@ -112,6 +112,12 @@ export default class Ghost {
         if (id) {
             return Ghost.hitSomething(pt, id, color);
         }
+        if (Paint.mode === 'paintbucket' || Paint.mode === 'camera') {
+            var geometry = Ghost.geometryHit(pt);
+            if (geometry) {
+                return Ghost.setGhostTo(geometry);
+            }
+        }
         // The bitmap mask test misses thin strokes when the click lands a
         // pixel or two off — common with a mouse compared to a finger.
         // Fall back to SVG's native getIntersectionList around a small box.
@@ -126,6 +132,26 @@ export default class Ghost {
             return Ghost.hitSomething(pt, fallback.id, 0);
         }
         return Ghost.notHitted(pt);
+    }
+
+    static geometryHit (pt) {
+        if (!Paint.root || typeof DOMPoint === 'undefined') return null;
+        var rootMatrix = Paint.root.getScreenCTM();
+        if (!rootMatrix) return null;
+        var screen = new DOMPoint(pt.x, pt.y).matrixTransform(rootMatrix);
+        var elements = Paint.root.querySelectorAll('path,ellipse,rect,polygon,polyline');
+        for (var i = elements.length - 1; i >= 0; i--) {
+            var elem = elements[i];
+            if (!elem.id || elem.id === 'staticbkg' || elem.getAttribute('fixed') === 'yes') continue;
+            var matrix = elem.getScreenCTM();
+            if (!matrix || typeof elem.isPointInFill !== 'function') continue;
+            var local = screen.matrixTransform(matrix.inverse());
+            if (elem.isPointInFill(local) ||
+                (typeof elem.isPointInStroke === 'function' && elem.isPointInStroke(local))) {
+                return elem;
+            }
+        }
+        return null;
     }
 
     static fuzzyHit (pt) {
@@ -477,11 +503,15 @@ export default class Ghost {
         var nostroke = (!elem.getAttribute('stroke')) || (elem.getAttribute('stroke') == 'none');
         var n = Number(elem.getAttribute('stroke-width'));
         ctx.lineWidth = nostroke ? 0 : n;
-        ctx.fillStyle = (elem.getAttribute('fill') == 'none') ?
+        var isClosed = SVG2Canvas.isCloseDPath(elem);
+        // Closed shapes must remain hittable through their interior even before
+        // they receive a visible fill. Paint bucket and camera both depend on
+        // this mask to select the target frame.
+        ctx.fillStyle = (elem.getAttribute('fill') == 'none' && !isClosed) ?
             'rgba(0,0,0,0)' : 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',255)';
         ctx.strokeStyle = !elem.getAttribute('stroke') ?
             'rgba(0,0,0,0)' : 'rgba(' + bc[0] + ',' + bc[1] + ',' + bc[2] + ',255)';
-        if (!SVG2Canvas.isCloseDPath(elem)) {
+        if (!isClosed) {
             ctx.strokeStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',255)';
         }
         if (elem.id.indexOf('pathborder_image') > -1) {
@@ -499,7 +529,7 @@ export default class Ghost {
         ctx.scale(Paint.currentZoom, Paint.currentZoom);
         SVG2Canvas.processXMLnode(elem, ctx, true);
         ctx.restore();
-        if (SVG2Canvas.isCloseDPath(elem)) {
+        if (isClosed) {
             return;
         }
         ctx.save();

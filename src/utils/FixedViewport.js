@@ -1,24 +1,36 @@
 export const DESIGN_WIDTH = 1280;
 export const DESIGN_HEIGHT = 720;
 
-let rootElement;
+let rootElements = [];
 let viewportScale = 1;
 let viewportLeft = 0;
 let viewportTop = 0;
 
-function getPageRoot () {
-    return document.getElementById('frame') ||
-        document.getElementById('aitrainer-root') ||
-        document.getElementById('tutorialmode');
+function getPageRoots () {
+    return ['frame', 'paintframe', 'libframe', 'aitrainer-root', 'tutorialmode']
+        .map(id => document.getElementById(id))
+        .filter(element => element);
+}
+
+function prepareRoot (element) {
+    if (rootElements.indexOf(element) > -1) return;
+    rootElements.push(element);
+    element.classList.add('fixed-viewport-canvas');
+    element.style.setProperty('transform-origin', '0 0', 'important');
+    element.style.width = `${DESIGN_WIDTH}px`;
+    element.style.height = `${DESIGN_HEIGHT}px`;
 }
 
 function resizeFixedViewport () {
-    if (!rootElement) return;
+    getPageRoots().forEach(prepareRoot);
+    if (!rootElements.length) return;
     viewportScale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
     viewportLeft = Math.max(0, (window.innerWidth - DESIGN_WIDTH * viewportScale) / 2);
     viewportTop = Math.max(0, (window.innerHeight - DESIGN_HEIGHT * viewportScale) / 2);
 
-    rootElement.style.transform = `translate(${viewportLeft}px, ${viewportTop}px) scale(${viewportScale})`;
+    rootElements.forEach(element => {
+        element.style.transform = `translate(${viewportLeft}px, ${viewportTop}px) scale(${viewportScale})`;
+    });
     document.documentElement.style.setProperty('--scratchjr-viewport-scale', viewportScale);
 }
 
@@ -31,16 +43,11 @@ export function getViewportOffset () {
 }
 
 export function initializeFixedViewport () {
-    rootElement = getPageRoot();
-    if (!rootElement) return;
-
     document.documentElement.classList.add('fixed-viewport');
     document.body.classList.add('fixed-viewport-body');
-    rootElement.classList.add('fixed-viewport-canvas');
-    rootElement.style.width = `${DESIGN_WIDTH}px`;
-    rootElement.style.height = `${DESIGN_HEIGHT}px`;
 
     resizeFixedViewport();
     window.addEventListener('resize', resizeFixedViewport);
     window.addEventListener('orientationchange', resizeFixedViewport);
+    new MutationObserver(resizeFixedViewport).observe(document.body, {childList: true});
 }

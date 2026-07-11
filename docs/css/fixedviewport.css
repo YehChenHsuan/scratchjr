@@ -15,7 +15,7 @@ body.fixed-viewport-body {
     top: 0 !important;
     left: 0 !important;
     margin: 0 !important;
-    transform-origin: 0 0;
+    transform-origin: 0 0 !important;
     contain: layout paint;
 }
 
@@ -31,4 +31,3 @@ body.fixed-viewport-body {
 #aitrainer-root.fixed-viewport-canvas .ait-stage {
     aspect-ratio: 16 / 9;
 }
-

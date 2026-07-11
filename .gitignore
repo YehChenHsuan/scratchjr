@@ -1,6 +1,8 @@
 /android/ScratchJr/app/src/main/gen/
 /node_modules
 /src/build/
+/dist/
+/.playwright-mcp/
 .DS_Store
 *.iml
 .gradle

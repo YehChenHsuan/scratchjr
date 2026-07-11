@@ -310,10 +310,13 @@ export default class Web {
             // screen rect of the painting canvas directly.
             const mc = document.getElementById('maincanvas');
             const rect = mc && mc.getBoundingClientRect();
-            const mx = rect ? Math.round(rect.left) : (data.mx | 0);
-            const my = rect ? Math.round(rect.top) : (data.my | 0);
-            const mw = rect ? Math.round(rect.width) : ((data.mw | 0) || (data.width | 0));
-            const mh = rect ? Math.round(rect.height) : ((data.mh | 0) || (data.height | 0));
+            const frame = document.getElementById('frame');
+            const frameRect = frame && frame.getBoundingClientRect();
+            const frameScale = frameRect && frameRect.width ? frameRect.width / 1280 : 1;
+            const mx = rect && frameRect ? Math.round((rect.left - frameRect.left) / frameScale) : (data.mx | 0);
+            const my = rect && frameRect ? Math.round((rect.top - frameRect.top) / frameScale) : (data.my | 0);
+            const mw = rect ? Math.round(rect.width / frameScale) : ((data.mw | 0) || (data.width | 0));
+            const mh = rect ? Math.round(rect.height / frameScale) : ((data.mh | 0) || (data.height | 0));
 
             videoEl = document.createElement('video');
             videoEl.id = 'scratchjr-camera-video';
@@ -321,7 +324,7 @@ export default class Web {
             videoEl.playsInline = true;
             videoEl.muted = true;
             videoEl.style.cssText = [
-                'position:fixed',
+                'position:absolute',
                 'left:' + mx + 'px',
                 'top:' + my + 'px',
                 'width:' + mw + 'px',
@@ -345,7 +348,7 @@ export default class Web {
                 mask.id = 'scratchjr-camera-mask';
                 mask.src = data.image;
                 mask.style.cssText = [
-                    'position:fixed',
+                    'position:absolute',
                     'left:' + mx + 'px',
                     'top:' + my + 'px',
                     'width:' + mw + 'px',
@@ -362,8 +365,8 @@ export default class Web {
             const wsUserW = (data.mw | 0) || Number(data.workspaceWidth) || 432;
             const wsUserH = (data.mh | 0) || Number(data.workspaceHeight) || 384;
             const sx = mw / wsUserW, sy = mh / wsUserH;
-            videoEl.dataset.targetX = ((data.x | 0)) * sx;
-            videoEl.dataset.targetY = ((data.y | 0)) * sy;
+            videoEl.dataset.targetX = ((data.x | 0) - (data.mx | 0)) * sx;
+            videoEl.dataset.targetY = ((data.y | 0) - (data.my | 0)) * sy;
             videoEl.dataset.targetW = ((data.width | 0)) * sx;
             videoEl.dataset.targetH = ((data.height | 0)) * sy;
             videoEl.dataset.workspaceW = mw;
@@ -458,6 +461,10 @@ export default class Web {
         let sw = targetW * scale;
         let sh = targetH * scale;
         if (!sw || !sh) { sx = 0; sy = 0; sw = vw; sh = vh; }
+        sx = Math.max(0, Math.min(vw - 1, sx));
+        sy = Math.max(0, Math.min(vh - 1, sy));
+        sw = Math.max(1, Math.min(vw - sx, sw));
+        sh = Math.max(1, Math.min(vh - sy, sh));
 
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(sw));

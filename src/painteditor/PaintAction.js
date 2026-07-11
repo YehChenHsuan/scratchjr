@@ -765,6 +765,9 @@ export default class PaintAction {
         if (isTablet) {
             PaintAction.fingerUp(evt);
         }
+        if (!currentShape) {
+            currentShape = Ghost.geometryHit(PaintAction.getScreenPt(evt));
+        }
         if (currentShape == undefined) {
             return;
         }
@@ -813,7 +816,12 @@ export default class PaintAction {
     }
 
     static paintBucketMouseUp (evt) {
+        // Newly-created shapes may not be present in the hit-test mask yet.
+        Ghost.drawOffscreen();
         PaintAction.fingerUp(evt);
+        if (!currentShape) {
+            currentShape = Ghost.geometryHit(PaintAction.getScreenPt(evt));
+        }
         if (!currentShape) {
             return;
         }
@@ -1126,7 +1134,9 @@ export default class PaintAction {
     }
 
     static getScreenPt (evt) {
-        var pt = Events.getTargetPoint(evt);
+        var source = evt.touches && evt.touches.length ? evt.touches[0] :
+            (evt.changedTouches && evt.changedTouches.length ? evt.changedTouches[0] : evt);
+        var pt = {x: source.clientX, y: source.clientY};
         return PaintAction.zoomPt(pt);
     }
 
@@ -1140,17 +1150,6 @@ export default class PaintAction {
         pt2.y = pt.y;
         var screenMatrix = Paint.root.getScreenCTM();
         var globalPoint = pt2.matrixTransform(screenMatrix.inverse());
-        // On legacy Safari/iOS WebView, getScreenCTM did NOT reflect CSS
-        // transform scales, so the original source divided by currentZoom
-        // as a manual correction. Modern browsers DO include the scale in
-        // the matrix, and a strict `!=` would also trip on floating-point
-        // noise between two ostensibly equal scales. Use a small epsilon
-        // and only apply the legacy correction when the matrix really has
-        // not been scaled.
-        if (Math.abs(screenMatrix.a - Paint.currentZoom) > 1e-3) {
-            globalPoint.x = globalPoint.x / Paint.currentZoom;
-            globalPoint.y = globalPoint.y / Paint.currentZoom;
-        }
         return globalPoint;
     }
 }

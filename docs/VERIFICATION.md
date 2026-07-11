@@ -18,6 +18,11 @@ Baseline: `b35cc40`
 - `npm run verify:pwa` confirms critical offline files and exact `src` to `docs` deployment consistency.
 - `npm run verify:ui` validates fixed-canvas scale expectations and five nonblank regression screenshots.
 - Persistent-storage usage/quota and the latest project-backup metadata are recorded locally.
+- Paint editor dynamic frames now join the fixed 1280 x 720 viewport scaler.
+- Paint SVG pointer conversion uses the browser screen matrix once, avoiding double scaling.
+- Paint bucket refreshes its hit-test mask and uses native SVG geometry fallback; the first unfilled rectangle was verified to fill from an interior click.
+- Camera preview/crop uses paint-canvas-local coordinates and clamps the video source rectangle.
+- `npm run release:pwa` produces `dist/pwa/` with optimized SVG files and excludes unused runtime artifacts.
 
 ## Pending External Acceptance
 
