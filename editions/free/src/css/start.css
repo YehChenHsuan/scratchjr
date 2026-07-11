@@ -65,6 +65,7 @@ div.frame {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: auto 100%;
+    animation: introCatBounce 700ms ease-out both;
 }
 
 *.jrlogo {
@@ -74,10 +75,35 @@ div.frame {
     margin: 0px;
     height: 16%;
     z-index: 10;
-    background: url('../assets/start/ScratchJrLogo.svg');
+    background: url('../assets/lobby/meowlogo.png');
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: auto 100%;
+    background-size: auto 92%;
+    animation: introLogoRise 650ms 180ms ease-out both;
+}
+
+*.rays {
+    animation: introRays 18s linear infinite;
+}
+
+@keyframes introCatBounce {
+    0% {opacity: 0; transform: translateY(-18%) scale(0.72);}
+    70% {opacity: 1; transform: translateY(3%) scale(1.06);}
+    100% {opacity: 1; transform: translateY(0) scale(1);}
+}
+
+@keyframes introLogoRise {
+    0% {opacity: 0; transform: translateY(22%);}
+    100% {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes introRays {
+    from {transform: rotate(0deg) scale(1.2);}
+    to {transform: rotate(360deg) scale(1.2);}
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *.catface, *.jrlogo, *.rays {animation: none;}
 }
 
 *.purple {
