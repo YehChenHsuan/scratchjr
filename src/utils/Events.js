@@ -3,6 +3,7 @@ the caller should define the window event and call startDrag with the appropiate
 */
 
 import {gn, scaleMultiplier, isTablet} from './lib';
+import {getViewportScale, getViewportOffset} from './FixedViewport';
 
 let dragged = false;
 let dragthumbnail = undefined;
@@ -258,23 +259,29 @@ export default class Events {
     */
 
     static getTargetPoint (e) {
+        var raw;
         if (isTablet) {
             if (e.touches && (e.touches.length > 0)) {
-                return {
+                raw = {
                     x: e.touches[0].pageX,
                     y: e.touches[0].pageY
                 };
             } else if (e.changedTouches) {
-                return {
+                raw = {
                     x: e.changedTouches[0].pageX,
                     y: e.changedTouches[0].pageY
                 };
             }
         }
-        return {
-            x: e.clientX,
-            y: e.clientY
-        };
+        if (!raw) {
+            raw = {
+                x: e.clientX,
+                y: e.clientY
+            };
+        }
+        var vs = getViewportScale();
+        var vo = getViewportOffset();
+        return {x: (raw.x - vo.x) / vs, y: (raw.y - vo.y) / vs};
     }
 
     static updatePinchCenter (e) {

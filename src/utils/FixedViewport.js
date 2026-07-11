@@ -2,6 +2,9 @@ export const DESIGN_WIDTH = 1280;
 export const DESIGN_HEIGHT = 720;
 
 let rootElement;
+let viewportScale = 1;
+let viewportLeft = 0;
+let viewportTop = 0;
 
 function getPageRoot () {
     return document.getElementById('frame') ||
@@ -11,12 +14,20 @@ function getPageRoot () {
 
 function resizeFixedViewport () {
     if (!rootElement) return;
-    const scale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
-    const left = Math.max(0, (window.innerWidth - DESIGN_WIDTH * scale) / 2);
-    const top = Math.max(0, (window.innerHeight - DESIGN_HEIGHT * scale) / 2);
+    viewportScale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
+    viewportLeft = Math.max(0, (window.innerWidth - DESIGN_WIDTH * viewportScale) / 2);
+    viewportTop = Math.max(0, (window.innerHeight - DESIGN_HEIGHT * viewportScale) / 2);
 
-    rootElement.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
-    document.documentElement.style.setProperty('--scratchjr-viewport-scale', scale);
+    rootElement.style.transform = `translate(${viewportLeft}px, ${viewportTop}px) scale(${viewportScale})`;
+    document.documentElement.style.setProperty('--scratchjr-viewport-scale', viewportScale);
+}
+
+export function getViewportScale () {
+    return viewportScale;
+}
+
+export function getViewportOffset () {
+    return {x: viewportLeft, y: viewportTop};
 }
 
 export function initializeFixedViewport () {
@@ -33,4 +44,3 @@ export function initializeFixedViewport () {
     window.addEventListener('resize', resizeFixedViewport);
     window.addEventListener('orientationchange', resizeFixedViewport);
 }
-
