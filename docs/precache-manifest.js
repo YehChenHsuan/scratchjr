@@ -1,4 +1,4 @@
-self.__SCRATCHJR_PRECACHE_VERSION="dcb7fa31fbfd5032";
+self.__SCRATCHJR_PRECACHE_VERSION="0e4010eaedc9fdea";
 self.__SCRATCHJR_PRECACHE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
@@ -118,7 +118,6 @@ self.__SCRATCHJR_PRECACHE_URLS=[
   "./assets/lib/stopon.svg",
   "./assets/libbkg.png",
   "./assets/loading.png",
-  "./assets/lobby/ImportProject.svg",
   "./assets/lobby/aboutOff.svg",
   "./assets/lobby/aboutOn.svg",
   "./assets/lobby/blocksOff.svg",
@@ -129,6 +128,7 @@ self.__SCRATCHJR_PRECACHE_URLS=[
   "./assets/lobby/gearOn.svg",
   "./assets/lobby/help.svg",
   "./assets/lobby/house.svg",
+  "./assets/lobby/importproject.png",
   "./assets/lobby/interfaceOff.svg",
   "./assets/lobby/interfaceOn.svg",
   "./assets/lobby/intro.mp4",

@@ -312,6 +312,26 @@ div.frame {
     transform: scaleX(-1);
 }
 
+.gesture-camera-close {
+    position: absolute;
+    top: ${4 * scaleMultiplier}px;
+    right: ${4 * scaleMultiplier}px;
+    width: ${26 * scaleMultiplier}px;
+    height: ${26 * scaleMultiplier}px;
+    line-height: ${24 * scaleMultiplier}px;
+    text-align: center;
+    font-size: ${20 * scaleMultiplier}px;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(0,0,0,.55);
+    border: ${2 * scaleMultiplier}px solid #fff;
+    border-radius: 50%;
+    z-index: 3;
+    cursor: pointer;
+    pointer-events: auto;
+    user-select: none;
+}
+
 #blockspalette .yellow { background: #FFE75A;}    /* #ffe100;}{ background: #FFFA5A;} */
 #blockspalette .blue { background: #4B8CC2;}
 #blockspalette .pink { background: #CD7CD1;}

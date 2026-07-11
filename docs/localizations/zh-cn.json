@@ -360,6 +360,7 @@
     "BLOCK_DESC_GO_TO_PAGE": "切换至第 {PAGE} 页",
     "SHARING_BY_EMAIL": "用电子邮件分享",
     "SHARING_BY_AIRDROP": "用 Airdrop 分享",
+    "SHARING_BY_DOWNLOAD": "下载到本机",
     "SHARING_EMAIL_SUBJECT": "ScratchJr 项目： {PROJECT_NAME}",
     "SHARING_EMAIL_TEXT": "在你的 iPad 或者 Android 平板上点击这个图标，试试我的 ScratchJr 项目！<br><br>如果你没有安装 ScratchJr 应用程序，你可以从 Apple 应用商店或者 Google Play 商店中<a href='http://www.scratchjr.org'>下载</a>。<br><br>ScratchJr 可以让孩子建立自己的互动故事或游戏。若要进一步了解，可以访问<a href='http://www.scratchjr.org'>scratchjr.org</a>。",
     "FOR_PARENTS": "致家长",

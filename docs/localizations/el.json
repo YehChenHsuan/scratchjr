@@ -360,6 +360,7 @@
     "BLOCK_DESC_GO_TO_PAGE": "ΠΗΓΑΙΝΕ ΣΤΗ ΣΕΛΙΔΑ {PAGE}",
     "SHARING_BY_EMAIL": "Μοιράσου μέσω Ηλεκτρονικού ταχυδρομείου",
     "SHARING_BY_AIRDROP": "Μοιράσου μέσω Airdrop",
+    "SHARING_BY_DOWNLOAD": "Download to Device",
     "SHARING_EMAIL_SUBJECT": "Εργασία ScratchJr: {PROJECT_NAME}",
     "SHARING_EMAIL_TEXT": "Κάνε κλικ στο εικονίδιο για να δοκιμάσεις το ScratchJr Έργο μου στο iPad ή το Android tablet σου!<br><br>Αν δεν έχεις την εφαρμογή ScratchJr, μπορείς <a href='http://www.scratchjr.org'>να την καταβέσεις</a> από το Apple App Store ή το Google Play Store. <br><br>Με το ScratchJr, τα παιδιά μπορούν να δημιουργήσουν τις δικές τους διαδραστικές ιστορίες και παιχνίδια. Για να μάθεις περισσότερα, δες το <a href='http://www.scratchjr.org'>scratchjr.org</a>.",
     "FOR_PARENTS": "Για Γονείς",
