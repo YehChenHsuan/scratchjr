@@ -52,6 +52,15 @@ export default class Camera {
         data.my = globaly(gn('workspacebkg')) + gn('maincanvas').dy;
         data.mw = Paint.workspaceWidth;
         data.mh = Paint.workspaceHeight;
+        // Preserve the target in paint-workspace coordinates. The web camera
+        // can map these directly into its preview rect without reconstructing
+        // them from global/CSS-scaled positions.
+        data.targetX = viewbox.x;
+        data.targetY = viewbox.y;
+        data.targetWidth = viewbox.width;
+        data.targetHeight = viewbox.height;
+        data.workspaceWidth = Paint.workspaceWidth;
+        data.workspaceHeight = Paint.workspaceHeight;
         data.image = mask.toDataURL('image/png');
         OS.startfeed(data, OS.trace);
         Paint.cameraToolsOn();

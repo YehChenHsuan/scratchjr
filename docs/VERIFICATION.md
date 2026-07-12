@@ -25,6 +25,7 @@ Baseline: `b35cc40`
 - Camera photos and geometry masks share one SVG group; a synthetic ellipse capture and subsequent `(+100, +50)` drag verified identical image/border movement.
 - Returning from the paint editor rendered nonblank character thumbnail and stage canvases after the grouped camera-photo edit.
 - Camera capture now matches the mirrored `object-fit: cover` preview; an off-center four-color source preserved preview quadrant order, returned fully opaque corner/center samples, and fills the SVG mask without letterboxing.
+- Physical-camera acceptance confirmed that the photographed subject retains its preview position after capture when target coordinates are passed directly in paint-workspace units.
 - `npm run release:pwa` produces `dist/pwa/` with optimized SVG files and excludes unused runtime artifacts.
 
 ## Pending External Acceptance

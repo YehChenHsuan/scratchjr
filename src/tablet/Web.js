@@ -365,10 +365,18 @@ export default class Web {
             const wsUserW = (data.mw | 0) || Number(data.workspaceWidth) || 432;
             const wsUserH = (data.mh | 0) || Number(data.workspaceHeight) || 384;
             const sx = mw / wsUserW, sy = mh / wsUserH;
-            videoEl.dataset.targetX = ((data.x | 0) - (data.mx | 0)) * sx;
-            videoEl.dataset.targetY = ((data.y | 0) - (data.my | 0)) * sy;
-            videoEl.dataset.targetW = ((data.width | 0)) * sx;
-            videoEl.dataset.targetH = ((data.height | 0)) * sy;
+            const hasWorkspaceTarget = Number.isFinite(Number(data.targetX)) &&
+                Number.isFinite(Number(data.targetY));
+            const targetX = hasWorkspaceTarget ? Number(data.targetX) :
+                ((data.x | 0) - (data.mx | 0));
+            const targetY = hasWorkspaceTarget ? Number(data.targetY) :
+                ((data.y | 0) - (data.my | 0));
+            const targetW = Number(data.targetWidth) || (data.width | 0);
+            const targetH = Number(data.targetHeight) || (data.height | 0);
+            videoEl.dataset.targetX = targetX * sx;
+            videoEl.dataset.targetY = targetY * sy;
+            videoEl.dataset.targetW = targetW * sx;
+            videoEl.dataset.targetH = targetH * sy;
             videoEl.dataset.workspaceW = mw;
             videoEl.dataset.workspaceH = mh;
 
