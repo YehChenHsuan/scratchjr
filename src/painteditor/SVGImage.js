@@ -40,7 +40,6 @@ export default class SVGImage {
         var index = Layer.groupStartsAt(p, mt);
         var group = Layer.onTopOf(p, index);
         var viewbox = SVGTools.getBox(mt).rounded();
-        console.log('[createImageFromFeed] mt:', mt.id, 'parent:', p && p.id, 'viewbox:', JSON.stringify(viewbox), 'group len:', group.length);
         var box = new Rectangle(0, 0, Paint.workspaceWidth, Paint.workspaceHeight);
         viewbox = viewbox.expandBy(20);
         viewbox.crop(box);
@@ -49,24 +48,18 @@ export default class SVGImage {
             imageid += 'staticbkg';
         }
         var g = SVGTools.createGroup(p, 'group_' + imageid);
-        // Make the clip Path — clipPath must live in <defs> or at the SVG root
-        // level to work in Chrome; placing it inside a <g> is not valid.
-        var svgRoot = Paint.root;
-        var defs = svgRoot.querySelector('defs');
-        if (!defs) {
-            defs = document.createElementNS(Paint.xmlns, 'defs');
-            svgRoot.insertBefore(defs, svgRoot.firstChild);
-        }
+        // Keep the clip path in the same group as the captured image. The
+        // editor moves this group as one unit, so the mask and photo retain
+        // identical coordinates in the paint editor and on the stage.
         var pathmask = SVGTools.getCopy(mt);
         pathmask.setAttribute('id', 'pathmask_' + imageid);
-        // clipPath 遮罩必須有填充色才能定義裁切區域
         pathmask.setAttribute('fill', 'black');
         pathmask.setAttribute('stroke', 'none');
-        var clippath = document.createElementNS(Paint.xmlns, 'clipPath');
-        clippath.setAttribute('id', 'clip_' + imageid);
-        clippath.setAttribute('clipPathUnits', 'userSpaceOnUse');
+        var clippath = SVGTools.addChild(g, 'clipPath', {
+            id: 'clip_' + imageid,
+            clipPathUnits: 'userSpaceOnUse'
+        });
         clippath.appendChild(pathmask);
-        defs.appendChild(clippath);
 
         // Make the image
         var img = document.createElementNS(Paint.xmlns, 'image');
@@ -83,7 +76,6 @@ export default class SVGImage {
         img.setAttributeNS(Paint.xmlnslink, 'xlink:href', 'data:image/png;base64,' + str);
         img.setAttribute('clip-path', 'url(#clip_' + imageid + ')');
         g.appendChild(img);
-        console.log('[createImageFromFeed] img added:', imageid, 'x:', viewbox.x, 'y:', viewbox.y, 'w:', viewbox.width, 'h:', viewbox.height, 'clip:', 'clip_' + imageid, 'clipInDefs:', !!document.getElementById('clip_' + imageid));
         // redefine the orginal shape
         var borderattr = {
             'id': 'pathborder_' + imageid,
@@ -97,7 +89,6 @@ export default class SVGImage {
         for (var i = 0; i < group.length; i++) {
             p.appendChild(group[i]);
         }
-        console.log('[createImageFromFeed DONE] viewbox:', JSON.stringify(viewbox), 'imageid:', imageid, 'layer1 children:', p.childElementCount, 'svgHTML:', Paint.root ? Paint.root.innerHTML.substring(0, 600) : 'no root');
     }
 
     //////////////////////

@@ -22,6 +22,8 @@ Baseline: `b35cc40`
 - Paint SVG pointer conversion uses the browser screen matrix once, avoiding double scaling.
 - Paint bucket refreshes its hit-test mask and uses native SVG geometry fallback; the first unfilled rectangle was verified to fill from an interior click.
 - Camera preview/crop uses paint-canvas-local coordinates and clamps the video source rectangle.
+- Camera photos and geometry masks share one SVG group; a synthetic ellipse capture and subsequent `(+100, +50)` drag verified identical image/border movement.
+- Returning from the paint editor rendered nonblank character thumbnail and stage canvases after the grouped camera-photo edit.
 - `npm run release:pwa` produces `dist/pwa/` with optimized SVG files and excludes unused runtime artifacts.
 
 ## Pending External Acceptance
