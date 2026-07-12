@@ -448,23 +448,28 @@ export default class Web {
         const wsH = Number(videoEl.dataset.workspaceH) || videoEl.videoHeight;
 
         const vw = videoEl.videoWidth, vh = videoEl.videoHeight;
-        // object-fit:cover scaling — video frame is centered + cropped to
-        // fill the preview rect. Match that math when picking source rect.
-        const scale = Math.max(vw / wsW, vh / wsH);
-        const coverW = vw / scale, coverH = vh / scale;
-        const offX = (wsW - coverW) / 2;
-        const offY = (wsH - coverH) / 2;
+        // Match CSS object-fit: cover exactly. `scale` is source pixels per
+        // preview pixel; any excess source area is cropped equally at the
+        // sides or top/bottom. The preview is mirrored, so X maps from right
+        // to left before the captured crop itself is flipped for output.
+        const scale = Math.min(vw / wsW, vh / wsH);
+        const visibleW = wsW * scale, visibleH = wsH * scale;
+        const sourceOffsetX = (vw - visibleW) / 2;
+        const sourceOffsetY = (vh - visibleH) / 2;
 
-        // Map target rect from workspace coords -> video frame coords.
-        let sx = (targetX - offX) * scale;
-        let sy = (targetY - offY) * scale;
+        // Map target rect from preview pixels -> camera source pixels.
         let sw = targetW * scale;
         let sh = targetH * scale;
+        let sx = sourceOffsetX + (wsW - targetX - targetW) * scale;
+        let sy = sourceOffsetY + targetY * scale;
         if (!sw || !sh) { sx = 0; sy = 0; sw = vw; sh = vh; }
-        sx = Math.max(0, Math.min(vw - 1, sx));
-        sy = Math.max(0, Math.min(vh - 1, sy));
-        sw = Math.max(1, Math.min(vw - sx, sw));
-        sh = Math.max(1, Math.min(vh - sy, sh));
+        // Keep the requested aspect ratio. If rounding puts the crop just
+        // outside the source, shift the whole rectangle instead of trimming
+        // only one dimension (which creates letterboxing in the SVG image).
+        sw = Math.max(1, Math.min(vw, sw));
+        sh = Math.max(1, Math.min(vh, sh));
+        sx = Math.max(0, Math.min(vw - sw, sx));
+        sy = Math.max(0, Math.min(vh - sh, sy));
 
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(sw));

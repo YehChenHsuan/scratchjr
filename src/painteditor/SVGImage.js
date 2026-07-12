@@ -74,6 +74,10 @@ export default class SVGImage {
             img.setAttribute(vl1, attr[vl1]);
         }
         img.setAttributeNS(Paint.xmlnslink, 'xlink:href', 'data:image/png;base64,' + str);
+        // The capture canvas is rounded to whole pixels and can differ from
+        // the SVG viewbox by a fraction of a percent. Fill the mask bounds
+        // instead of letting the default `meet` mode create white bars.
+        img.setAttribute('preserveAspectRatio', 'none');
         img.setAttribute('clip-path', 'url(#clip_' + imageid + ')');
         g.appendChild(img);
         // redefine the orginal shape
