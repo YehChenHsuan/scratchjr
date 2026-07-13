@@ -1,4 +1,4 @@
-self.__SCRATCHJR_PRECACHE_VERSION="2c647b5808d2e612";
+self.__SCRATCHJR_PRECACHE_VERSION="3643fd29baa17616";
 self.__SCRATCHJR_CORE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
@@ -396,7 +396,6 @@ self.__SCRATCHJR_CORE_URLS=[
   "./svglibrary/Star.svg"
 ];
 self.__SCRATCHJR_AI_URLS=[
-  "./vendor/ai/knn/knn-classifier.min.js",
   "./vendor/ai/mediapipe/hand_landmark_full.tflite",
   "./vendor/ai/mediapipe/hands.binarypb",
   "./vendor/ai/mediapipe/hands.js",
@@ -405,13 +404,5 @@ self.__SCRATCHJR_AI_URLS=[
   "./vendor/ai/mediapipe/hands_solution_simd_wasm_bin.js",
   "./vendor/ai/mediapipe/hands_solution_simd_wasm_bin.wasm",
   "./vendor/ai/mediapipe/hands_solution_wasm_bin.js",
-  "./vendor/ai/mediapipe/hands_solution_wasm_bin.wasm",
-  "./vendor/ai/mobilenet/mobilenet.min.js",
-  "./vendor/ai/mobilenet/model/group1-shard1of5.bin",
-  "./vendor/ai/mobilenet/model/group1-shard2of5.bin",
-  "./vendor/ai/mobilenet/model/group1-shard3of5.bin",
-  "./vendor/ai/mobilenet/model/group1-shard4of5.bin",
-  "./vendor/ai/mobilenet/model/group1-shard5of5.bin",
-  "./vendor/ai/mobilenet/model/model.json",
-  "./vendor/ai/tfjs/tf.min.js"
+  "./vendor/ai/mediapipe/hands_solution_wasm_bin.wasm"
 ];

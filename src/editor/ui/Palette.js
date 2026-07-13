@@ -438,7 +438,8 @@ export default class Palette {
         var projectId = ScratchJr.currentProject || 'default';
         Palette.addGestureTrainerButton(pal, dx);
         dx += betweenblocks + 10;
-        GestureStorage.getTrainedGestures(projectId).then(gestures => {
+        Promise.all([GestureStorage.getTrainedGestures(projectId), GestureStorage.load(projectId)]).then(values => {
+            var gestures = values[1] && values[1].legacy ? [] : values[0];
             if (numcat != (BlockSpecs.categories.length - 1)) {
                 return;
             }

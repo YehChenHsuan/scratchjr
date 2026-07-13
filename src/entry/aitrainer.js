@@ -3,6 +3,7 @@
 
 import GestureTrainer, {MIN_SAMPLES, MAX_SAMPLES} from '../gesture/GestureTrainer';
 import {GESTURE_DEFS, gestureShortLabel} from '../gesture/GestureDefs';
+import Localization from '../utils/Localization';
 
 export function aiTrainerMain () {
     const params = new window.URLSearchParams(window.location.search);
@@ -218,7 +219,9 @@ export function aiTrainerMain () {
                 return;
             }
             trainer = nextTrainer;
-            setStatus('ready', 'Select a gesture to start training.');
+            setStatus('ready', trainer.legacy
+                ? Localization.localize('GESTURE_LEGACY_RETRAIN')
+                : 'Select a gesture to start training.');
             GESTURE_DEFS.forEach(def => updateCellCount(def.id, trainer.getSampleCount(def.id)));
             if (!selectedId) {
                 selectGesture(GESTURE_DEFS[0].id);

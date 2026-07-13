@@ -8,7 +8,6 @@
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development --progress --hide-modules",
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production --progress --hide-modules",
     "sync:ai": "node scripts/sync-ai-vendor.js",
-    "fetch:ai-model": "node scripts/fetch-mobilenet-model.js",
     "icons:pwa": "node scripts/generate-pwa-icons.js",
     "precache": "node scripts/generate-precache.js",
     "verify:pwa": "node scripts/verify-pwa.js",
@@ -49,9 +48,6 @@
   },
   "dependencies": {
     "@mediapipe/hands": "^0.4.1675469240",
-    "@tensorflow-models/knn-classifier": "^1.2.4",
-    "@tensorflow-models/mobilenet": "^2.1.0",
-    "@tensorflow/tfjs": "^4.10.0",
     "intl": "^1.0.1",
     "intl-messageformat": "^1.2.0",
     "jszip": "^3.10.1",

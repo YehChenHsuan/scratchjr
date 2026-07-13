@@ -6,20 +6,11 @@
 import OS from '../tablet/OS';
 
 export default class GestureStorage {
-    static save (projectId, knnClassifier, metadata) {
-        // KNN tensors -> plain JS arrays so we can JSON-serialize.
-        const dataset = knnClassifier.getClassifierDataset();
-        const serial = {};
-        for (const label of Object.keys(dataset)) {
-            const t = dataset[label];
-            serial[label] = {
-                data: Array.from(t.dataSync()),
-                shape: t.shape
-            };
-        }
+    static save (projectId, classifier, metadata) {
         const payload = {
-            version: 1,
-            dataset: serial,
+            version: 2,
+            format: 'landmark-v1',
+            dataset: classifier.toJSON(),
             metadata: metadata || {},
             mtime: Date.now()
         };
@@ -34,7 +25,7 @@ export default class GestureStorage {
         });
     }
 
-    static load (projectId, tf) {
+    static load (projectId) {
         return new Promise(resolve => {
             const finish = (raw) => {
                 if (!raw) { resolve(null); return; }
@@ -42,12 +33,11 @@ export default class GestureStorage {
                 try { payload = typeof raw === 'string' ? JSON.parse(raw) : raw; }
                 catch (e) { resolve(null); return; }
                 if (!payload || !payload.dataset) { resolve(null); return; }
-                const tensors = {};
-                for (const label of Object.keys(payload.dataset)) {
-                    const v = payload.dataset[label];
-                    tensors[label] = tf.tensor(v.data, v.shape);
+                if (payload.version !== 2 || payload.format !== 'landmark-v1') {
+                    resolve({legacy: true, metadata: payload.metadata || {}});
+                    return;
                 }
-                resolve({tensors, metadata: payload.metadata || {}});
+                resolve({legacy: false, dataset: payload.dataset, metadata: payload.metadata || {}});
             };
             if (OS.gesture_load) {
                 OS.gesture_load(projectId, finish);

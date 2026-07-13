@@ -1,8 +1,8 @@
-// Drives the training UX: collects activation samples, manages KNN classifier,
-// and produces a model that GestureEngine can later load.
+// Drives the training UX using normalized MediaPipe landmark samples.
 
 import GestureEngine from './GestureEngine';
 import GestureStorage from './GestureStorage';
+import LandmarkClassifier from './LandmarkClassifier';
 import {GESTURE_DEFS} from './GestureDefs';
 
 export const MIN_SAMPLES = 20;
@@ -15,104 +15,76 @@ export default class GestureTrainer {
         this.projectId = projectId;
         this.engine = new GestureEngine();
         this.knn = null;
-        this.tf = null;
-        this.mobilenet = null;
-        this.knnClassifier = null;
+        this.legacy = false;
         this.sampleCounts = {};
         this.collectingTimer = null;
     }
 
     async init () {
-        // engine.startCameraOnly loads tf/mobilenet/knnClassifier from CDN
-        // AND already calls `mobilenet.load()` to produce a usable model
-        // instance. Reuse that instance (it has .infer()) — the global
-        // `window.mobilenet` is only the namespace and has no infer fn.
         await this.engine.startCameraOnly(document.getElementById('gesture-trainer-video'),
             document.getElementById('gesture-trainer-overlay'));
-        this.tf = window.tf;
-        this.knnClassifier = window.knnClassifier;
-        this.mobilenet = this.engine.mobilenetModel;  // loaded model
-        this.knn = this.knnClassifier.create();
-
-        // Restore previous samples if any.
-        const stored = await GestureStorage.load(this.projectId, this.tf);
-        if (stored) {
-            const filtered = {};
-            for (const label of Object.keys(stored.tensors)) {
-                if (VALID_GESTURE_IDS.indexOf(label) > -1) {
-                    filtered[label] = stored.tensors[label];
-                    this.sampleCounts[label] = stored.tensors[label].shape[0];
-                }
+        this.knn = new LandmarkClassifier();
+        const stored = await GestureStorage.load(this.projectId);
+        if (!stored) return;
+        this.legacy = Boolean(stored.legacy);
+        if (this.legacy) return;
+        const filtered = {};
+        Object.keys(stored.dataset).forEach(label => {
+            if (VALID_GESTURE_IDS.indexOf(label) > -1) {
+                filtered[label] = stored.dataset[label];
+                this.sampleCounts[label] = stored.dataset[label].length;
             }
-            this.knn.setClassifierDataset(filtered);
-        }
+        });
+        this.knn.fromJSON(filtered);
     }
 
-    getSampleCount (gestureId) {
-        return this.sampleCounts[gestureId] || 0;
-    }
+    getSampleCount (gestureId) { return this.sampleCounts[gestureId] || 0; }
 
     resetGesture (gestureId) {
         this.stopCollecting();
-        if (this.knn && this.knn.clearClass) {
-            this.knn.clearClass(gestureId);
-        }
+        if (this.knn) this.knn.clearClass(gestureId);
         this.sampleCounts[gestureId] = 0;
     }
 
     startCollecting (gestureId, onTick) {
         this.stopCollecting();
         const target = MAX_SAMPLES;
-        this.collectingTimer = setInterval(async () => {
+        this.collectingTimer = setInterval(() => {
             if ((this.sampleCounts[gestureId] || 0) >= target) {
                 this.stopCollecting();
-                if (onTick) {
-                    onTick(this.sampleCounts[gestureId], target, true);
-                }
+                if (onTick) onTick(this.sampleCounts[gestureId], target, true);
                 return;
             }
-            const act = await this.engine.getActivation();
-            if (act) {
-                this.knn.addExample(act, gestureId);
-                act.dispose();
+            const feature = this.engine.latestFeature;
+            if (feature && this.knn.addExample(feature, gestureId)) {
                 this.sampleCounts[gestureId] = (this.sampleCounts[gestureId] || 0) + 1;
-                if (onTick) {
-                    onTick(this.sampleCounts[gestureId], target, false);
-                }
+                if (onTick) onTick(this.sampleCounts[gestureId], target, false);
             }
         }, SAMPLE_INTERVAL_MS);
     }
 
     stopCollecting () {
-        if (this.collectingTimer) {
-            clearInterval(this.collectingTimer);
-        }
+        if (this.collectingTimer) clearInterval(this.collectingTimer);
         this.collectingTimer = null;
     }
 
     async testOnce () {
-        if (this.knn.getNumClasses() === 0) return null;
-        const act = await this.engine.getActivation();
-        if (!act) return null;
-        const res = await this.knn.predictClass(act);
-        act.dispose();
-        res.label = this.engine._resolveLabel(res);
-        return res;
+        if (this.knn.getNumClasses() === 0 || !this.engine.latestFeature) return null;
+        const result = this.knn.predict(this.engine.latestFeature);
+        result.label = this.engine._resolveLabel(result);
+        return result;
     }
 
     async saveModel () {
-        // Filter out under-trained gestures so they don't pollute prediction.
-        const dataset = this.knn.getClassifierDataset();
+        const dataset = this.knn.toJSON();
         const filtered = {};
-        for (const label of Object.keys(dataset)) {
-            if ((VALID_GESTURE_IDS.indexOf(label) > -1) &&
-                    ((this.sampleCounts[label] || 0) >= MIN_SAMPLES)) {
-                filtered[label] = dataset[label];
-            }
-        }
-        const tmp = this.knnClassifier.create();
-        tmp.setClassifierDataset(filtered);
-        await GestureStorage.save(this.projectId, tmp, {trained: Object.keys(filtered)});
+        Object.keys(dataset).forEach(label => {
+            if (VALID_GESTURE_IDS.indexOf(label) > -1 &&
+                    (this.sampleCounts[label] || 0) >= MIN_SAMPLES) filtered[label] = dataset[label];
+        });
+        const classifier = LandmarkClassifier.fromJSON(filtered);
+        await GestureStorage.save(this.projectId, classifier, {trained: Object.keys(filtered)});
+        this.legacy = false;
         return Object.keys(filtered);
     }
 

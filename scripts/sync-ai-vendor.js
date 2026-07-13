@@ -5,11 +5,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'editions', 'free', 'src', 'vendor', 'ai');
-
 const FILES = [
-    ['@tensorflow/tfjs/dist/tf.min.js', 'tfjs/tf.min.js'],
-    ['@tensorflow-models/mobilenet/dist/mobilenet.min.js', 'mobilenet/mobilenet.min.js'],
-    ['@tensorflow-models/knn-classifier/dist/knn-classifier.min.js', 'knn/knn-classifier.min.js'],
     ['@mediapipe/hands/hands.js', 'mediapipe/hands.js'],
     ['@mediapipe/hands/hands.binarypb', 'mediapipe/hands.binarypb'],
     ['@mediapipe/hands/hand_landmark_full.tflite', 'mediapipe/hand_landmark_full.tflite'],
@@ -29,4 +25,3 @@ FILES.forEach(([modulePath, destination]) => {
 });
 
 console.log(`Synced ${FILES.length} AI runtime files to ${OUT}`);
-

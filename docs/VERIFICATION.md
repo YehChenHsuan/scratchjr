@@ -8,7 +8,7 @@ Baseline: `b35cc40`
 - `npm.cmd run build:web`: production bundle completed successfully.
 - Precache manifest: 411 same-origin files generated; all 411 returned HTTP success from `localhost:8080`.
 - First-launch UI: browser displayed Traditional Chinese `我的專案` and `匯入作品`.
-- AI trainer: TensorFlow.js, MobileNet, KNN, MediaPipe Hands and WASM loaded from `/vendor/ai/`; no CDN runtime dependency observed.
+- AI trainer: MediaPipe Hands and WASM load from `/vendor/ai/`; landmark classification is bundled pure JavaScript with no CDN runtime dependency.
 - Browser console: home page had no errors; AI page only reported a development-server WASM MIME fallback warning and completed ArrayBuffer loading.
 - `git diff --check`: no whitespace errors.
 - codebase-memory-mcp: moderate index refreshed and ADR 0001 recorded.

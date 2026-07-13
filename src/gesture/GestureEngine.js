@@ -1,25 +1,19 @@
-// Real-time gesture inference using locally bundled MobileNet + KNN classifier.
+// Real-time gesture inference using MediaPipe landmarks and a lightweight KNN classifier.
 
 import GestureStorage from './GestureStorage';
+import LandmarkClassifier from './LandmarkClassifier';
 import {GESTURE_DEFS, getGestureDef} from './GestureDefs';
 
-let _tf = null, _mobilenet = null, _knnClassifier = null, _hands = null;
+let _hands = null;
 const AI_ROOT = './vendor/ai/';
-const MOBILENET_MODEL = AI_ROOT + 'mobilenet/model/model.json';
 
 async function loadLibs () {
-    if (_tf) {
-        return {tf: _tf, mobilenet: _mobilenet, knnClassifier: _knnClassifier, Hands: _hands};
+    if (_hands) {
+        return {Hands: _hands};
     }
-    await loadScript(AI_ROOT + 'tfjs/tf.min.js');
-    await loadScript(AI_ROOT + 'mobilenet/mobilenet.min.js');
-    await loadScript(AI_ROOT + 'knn/knn-classifier.min.js');
     await loadScript(AI_ROOT + 'mediapipe/hands.js');
-    _tf = window.tf;
-    _mobilenet = window.mobilenet;
-    _knnClassifier = window.knnClassifier;
     _hands = window.Hands;
-    return {tf: _tf, mobilenet: _mobilenet, knnClassifier: _knnClassifier, Hands: _hands};
+    return {Hands: _hands};
 }
 
 function loadScript (src) {
@@ -34,15 +28,6 @@ function loadScript (src) {
     });
 }
 
-function loadMobileNet (mobilenet) {
-    return mobilenet.load({
-        version: 1,
-        alpha: 1.0,
-        modelUrl: MOBILENET_MODEL,
-        inputRange: [0, 1]
-    });
-}
-
 const CONFIDENCE_THRESHOLD = 0.75;
 const STABLE_FRAMES = 3;
 const COOLDOWN_MS = 1000;
@@ -53,8 +38,6 @@ const HAND_CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],
 
 export default class GestureEngine {
     constructor () {
-        this.tf = null;
-        this.mobilenetModel = null;
         this.knn = null;
         this.stream = null;
         this.videoEl = null;
@@ -64,14 +47,12 @@ export default class GestureEngine {
         this.streakCount = 0;
         this.onDetect = null;
         this.hands = null;
-        this.handCanvas = document.createElement('canvas');
-        this.handCanvas.width = 224;
-        this.handCanvas.height = 224;
         this.overlayCanvas = null;
         this.handDetected = false;
         this.handTracking = false;
         this.lastHandFrame = 0;
         this.extendedFingerCount = null;
+        this.latestFeature = null;
     }
 
     onGestureDetected (cb) {
@@ -80,41 +61,25 @@ export default class GestureEngine {
 
     async startCameraOnly (videoEl, overlayCanvas) {
         const libs = await loadLibs();
-        this.tf = libs.tf;
         this.videoEl = videoEl;
         this.stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}});
         videoEl.srcObject = this.stream;
         await videoEl.play();
         await this._startHandTracking(libs.Hands, overlayCanvas);
-        if (!this.mobilenetModel) {
-            this.mobilenetModel = await loadMobileNet(libs.mobilenet);
-        }
-    }
-
-    async getActivation () {
-        if (!this.mobilenetModel) {
-            const libs = await loadLibs();
-            this.mobilenetModel = await loadMobileNet(libs.mobilenet);
-        }
-        return this.handDetected ? this.mobilenetModel.infer(this.handCanvas, 'conv_preds') : null;
     }
 
     async start (projectId, videoEl, overlayCanvas) {
         const libs = await loadLibs();
-        this.tf = libs.tf;
-        if (!this.mobilenetModel) {
-            this.mobilenetModel = await loadMobileNet(libs.mobilenet);
-        }
-        this.knn = libs.knnClassifier.create();
-        const stored = await GestureStorage.load(projectId, libs.tf);
-        if (stored) {
+        this.knn = new LandmarkClassifier();
+        const stored = await GestureStorage.load(projectId);
+        if (stored && !stored.legacy) {
             const filtered = {};
-            for (const label of Object.keys(stored.tensors)) {
+            for (const label of Object.keys(stored.dataset)) {
                 if (VALID_GESTURE_IDS.indexOf(label) > -1) {
-                    filtered[label] = stored.tensors[label];
+                    filtered[label] = stored.dataset[label];
                 }
             }
-            this.knn.setClassifierDataset(filtered);
+            this.knn.fromJSON(filtered);
         }
 
         if (!this.stream) {
@@ -132,15 +97,14 @@ export default class GestureEngine {
         while (this.running) {
             try {
                 if (this.knn && this.knn.getNumClasses() > 0) {
-                    const activation = await this.getActivation();
-                    if (!activation) {
+                    const feature = this.latestFeature;
+                    if (!feature) {
                         this.streakLabel = null;
                         this.streakCount = 0;
                         await new Promise(r => setTimeout(r, 120));
                         continue;
                     }
-                    const result = await this.knn.predictClass(activation);
-                    activation.dispose();
+                    const result = this.knn.predict(feature);
                     const label = this._resolveLabel(result);
                     const conf = result.confidences[label] || 0;
                     if (conf >= CONFIDENCE_THRESHOLD) {
@@ -169,7 +133,7 @@ export default class GestureEngine {
         }
     }
 
-    // MobileNet's embedding alone can confuse 1-finger vs 2-finger gestures
+    // KNN confidence alone can confuse 1-finger vs 2-finger gestures
     // when both are trained, since their silhouettes can look similar from
     // some angles. When the landmark-based finger count is unambiguous (1
     // or 2), prefer the highest-confidence KNN label whose GESTURE_DEFS
@@ -231,7 +195,7 @@ export default class GestureEngine {
     // Counts fingers held straight (index/middle/ring/pinky) using the
     // classic "tip is farther from the wrist than its own middle joint"
     // heuristic on MediaPipe's 21 hand landmarks. This is independent of
-    // the MobileNet embedding, so it disambiguates 1-finger vs 2-finger
+    // the KNN vote, so it disambiguates 1-finger vs 2-finger
     // gestures even when their overall hand silhouettes look similar to
     // the KNN classifier.
     static countExtendedFingers (landmarks) {
@@ -261,7 +225,9 @@ export default class GestureEngine {
 
     _drawHand (results) {
         const landmarks = results.multiHandLandmarks && results.multiHandLandmarks[0];
+        const handedness = results.multiHandedness && results.multiHandedness[0];
         this.handDetected = Boolean(landmarks);
+        this.latestFeature = LandmarkClassifier.featureFromLandmarks(landmarks, handedness);
         this.extendedFingerCount = landmarks ? GestureEngine.countExtendedFingers(landmarks) : null;
         const overlay = this.overlayCanvas;
         if (overlay) {
@@ -288,25 +254,12 @@ export default class GestureEngine {
                 });
             }
         }
-        if (!landmarks) return;
-        const xs = landmarks.map(point => point.x);
-        const ys = landmarks.map(point => point.y);
-        const margin = 0.12;
-        const x1 = Math.max(0, Math.min.apply(null, xs) - margin);
-        const y1 = Math.max(0, Math.min.apply(null, ys) - margin);
-        const x2 = Math.min(1, Math.max.apply(null, xs) + margin);
-        const y2 = Math.min(1, Math.max.apply(null, ys) + margin);
-        const ctx = this.handCanvas.getContext('2d');
-        ctx.fillStyle = '#10252d';
-        ctx.fillRect(0, 0, 224, 224);
-        ctx.drawImage(this.videoEl, x1 * this.videoEl.videoWidth, y1 * this.videoEl.videoHeight,
-            (x2 - x1) * this.videoEl.videoWidth, (y2 - y1) * this.videoEl.videoHeight,
-            0, 0, 224, 224);
     }
 
     stopCamera () {
         this.handTracking = false;
         this.handDetected = false;
+        this.latestFeature = null;
         if (this.stream) {
             this.stream.getTracks().forEach(t => t.stop());
         }
