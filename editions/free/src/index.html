@@ -13,6 +13,9 @@
 <html>
 
 <head>
+<!-- Critical CSS: keep .hide elements hidden before start.css loads (avoids
+     the usage-question icons flashing full screen on slow networks). -->
+<style>.hide{display:none;}</style>
 <title>ScratchJr Intro</title>
 <script>
     window.scratchJrPage = 'index';
