@@ -34,7 +34,11 @@ async function copyRuntime (source, output, files) {
         }
         let data = fs.readFileSync(sourcePath);
         const ext = path.extname(name).toLowerCase();
-        if (ext === '.svg') {
+        // svglibrary/samples SVGs are parsed by the ScratchJr engine at
+        // runtime and depend on their original structure (g ids, points
+        // attributes); SVGO rewriting breaks sprite rendering.
+        const engineParsed = relative.indexOf('svglibrary/') === 0 || relative.indexOf('samples/') === 0;
+        if (ext === '.svg' && !engineParsed) {
             const result = optimize(data.toString('utf8'), {
                 path: sourcePath,
                 multipass: true,
@@ -99,6 +103,11 @@ async function copyRuntime (source, output, files) {
         pngSavedBytes
     };
     fs.writeFileSync(path.join(OUTPUT, 'deployment-report.json'), JSON.stringify(report, null, 2));
+    // Netlify headers: keep the service worker fresh, fix webmanifest MIME.
+    fs.writeFileSync(path.join(OUTPUT, '_headers'),
+        '/service-worker.js\n  Cache-Control: no-cache\n' +
+        '/precache-manifest.js\n  Cache-Control: no-cache\n' +
+        '/*.webmanifest\n  Content-Type: application/manifest+json\n');
     console.log(`PWA deployment package: ${OUTPUT}`);
     console.log(JSON.stringify(report, null, 2));
 })();
