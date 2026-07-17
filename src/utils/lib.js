@@ -87,10 +87,31 @@ export function preprocess (s) {
  * Load the URL synchronously (fine because it's file://), preprocess the result and return the string.
  */
 export function preprocessAndLoad (url) {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open('GET', url, false);
-    xmlhttp.send();
-    return preprocess(xmlhttp.responseText);
+    // Synchronous XHR is NOT intercepted by the service worker, so it fails
+    // hard when offline. Keep a localStorage copy of every successfully
+    // loaded asset and fall back to it so pages can boot without network.
+    var text = '';
+    try {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open('GET', url, false);
+        xmlhttp.send();
+        if (xmlhttp.status === 200 || (xmlhttp.status === 0 && xmlhttp.responseText)) {
+            text = xmlhttp.responseText;
+        }
+    } catch (e) {
+        // offline - use the cached copy below
+    }
+    var key = 'scratchjr_asset_' + url;
+    try {
+        if (text) {
+            window.localStorage.setItem(key, text);
+        } else {
+            text = window.localStorage.getItem(key) || '';
+        }
+    } catch (e) {
+        // storage unavailable or full - proceed with whatever we have
+    }
+    return preprocess(text);
 }
 
 /**

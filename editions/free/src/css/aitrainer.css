@@ -249,25 +249,31 @@ body {
     background-image: url('../assets/aitrainer/hand-one.svg');
 }
 
-.gesture-2-up,
-.gesture-2-down,
-.gesture-2-left,
-.gesture-2-right {
-    background-image: url('../assets/aitrainer/hand-two.svg');
+.gesture-2-up {
+    background-image: url('../assets/aitrainer/hand_A.svg');
 }
 
-.gesture-1-down,
 .gesture-2-down {
+    background-image: url('../assets/aitrainer/hand_B.svg');
+}
+
+.gesture-2-left {
+    background-image: url('../assets/aitrainer/hand_C.svg');
+}
+
+.gesture-2-right {
+    background-image: url('../assets/aitrainer/hand_D.svg');
+}
+
+.gesture-1-down {
     --gesture-rotation: 180deg;
 }
 
-.gesture-1-left,
-.gesture-2-left {
+.gesture-1-left {
     --gesture-rotation: -90deg;
 }
 
-.gesture-1-right,
-.gesture-2-right {
+.gesture-1-right {
     --gesture-rotation: 90deg;
 }
 
@@ -306,18 +312,19 @@ body {
     display: none;
 }
 
-.gesture-2-up .finger-a,
-.gesture-2-down .finger-a,
-.gesture-2-left .finger-a,
-.gesture-2-right .finger-a {
-    left: 34%;
-}
-
-.gesture-2-up .finger-b,
-.gesture-2-down .finger-b,
-.gesture-2-left .finger-b,
-.gesture-2-right .finger-b {
-    left: 51%;
+.gesture-2-up .hand-palm,
+.gesture-2-down .hand-palm,
+.gesture-2-left .hand-palm,
+.gesture-2-right .hand-palm,
+.gesture-2-up .finger,
+.gesture-2-down .finger,
+.gesture-2-left .finger,
+.gesture-2-right .finger,
+.gesture-2-up .hand-thumb,
+.gesture-2-down .hand-thumb,
+.gesture-2-left .hand-thumb,
+.gesture-2-right .hand-thumb {
+    display: none;
 }
 
 .hand-thumb {
@@ -440,6 +447,27 @@ body {
     border-left: 7px solid #287f46;
     border-bottom: 7px solid #287f46;
     transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Detected gesture number (1-8) shown after a test hit */
+.ait-result.result-hit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 clamp(20px, 3.2vw, 52px)/1 Roboto, arial, sans-serif;
+    color: #287f46;
+    padding: 0.15em 0.4em;
+    width: auto;
+    min-width: 5%;
+}
+
+.ait-result.result-hit:before {
+    display: none;
+}
+
+.ait-cell.detected {
+    border-color: #ffbe57;
+    box-shadow: 0 0 0 6px rgba(255, 190, 87, .45);
 }
 
 .result-empty:before {

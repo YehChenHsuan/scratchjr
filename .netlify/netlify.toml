@@ -1,0 +1,42 @@
+plugins = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "C:\\Users\\LENOVO\\Downloads\\scratchjr-web"
+publishOrigin = "default"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/service-worker.js"
+
+[headers.values]
+Cache-Control = "no-cache"
+
+[[headers]]
+for = "/precache-manifest.js"
+
+[headers.values]
+Cache-Control = "no-cache"
+
+[[headers]]
+for = "/*.webmanifest"
+
+[headers.values]
+Content-Type = "application/manifest+json"

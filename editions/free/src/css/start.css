@@ -56,9 +56,9 @@ div.frame {
 
 *.catface {
     position: absolute;
-    top: 18%;
+    top: 15.8%;
     margin: 0px;
-    height: 22%;
+    height: 26.4%;
     z-index: 5;
     background: url('../assets/start/Cat.svg');
     width: 100%;

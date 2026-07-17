@@ -108,10 +108,17 @@ export function aiTrainerMain () {
         stageEl.dataset.state = state;
     }
 
-    function setResult (state, label) {
-        resultEl.style.display = 'block';
+    function setResult (state, label, text) {
+        resultEl.style.display = state === 'hit' ? 'flex' : 'block';
         resultEl.className = 'ait-result result-' + state;
         resultEl.setAttribute('aria-label', label);
+        resultEl.textContent = text || '';
+    }
+
+    // Buttons are numbered by grid position: left column top-to-bottom 1-4,
+    // right column top-to-bottom 5-8, matching GESTURE_DEFS order.
+    function gestureNumber (id) {
+        return GESTURE_DEFS.findIndex(def => def.id === id) + 1;
     }
 
     bindPress(document.getElementById('ait-back'), () => {
@@ -181,8 +188,12 @@ export function aiTrainerMain () {
             setResult('empty', 'No trained gestures yet.');
             return;
         }
+        const num = gestureNumber(res.label);
         setResult('hit', `Detected ${gestureShortLabel(res.label)} ` +
-            `(${(res.confidences[res.label] * 100).toFixed(0)}%)`);
+            `(${(res.confidences[res.label] * 100).toFixed(0)}%)`, String(num));
+        Array.from(grid.children).forEach(cell => {
+            cell.classList.toggle('detected', cell.dataset.id === res.label);
+        });
     });
 
     bindPress(document.getElementById('ait-save'), async () => {
