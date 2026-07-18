@@ -1,4 +1,4 @@
-﻿self.__SCRATCHJR_PRECACHE_VERSION="6f3a9d1c8e52b740";
+self.__SCRATCHJR_PRECACHE_VERSION="93c14ba67bc7cc70";
 self.__SCRATCHJR_CORE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
@@ -496,8 +496,8 @@ self.__SCRATCHJR_CORE_URLS=[
   "./pnglibrary/ShootingStar.png",
   "./pnglibrary/Shop.png",
   "./pnglibrary/Snake.png",
-  "./pnglibrary/Soccerball.png",
   "./pnglibrary/SoccerNet.png",
+  "./pnglibrary/Soccerball.png",
   "./pnglibrary/Space.png",
   "./pnglibrary/Spring.png",
   "./pnglibrary/Star.png",
@@ -662,8 +662,8 @@ self.__SCRATCHJR_CORE_URLS=[
   "./svglibrary/ShootingStar.svg",
   "./svglibrary/Shop.svg",
   "./svglibrary/Snake.svg",
-  "./svglibrary/Soccerball.svg",
   "./svglibrary/SoccerNet.svg",
+  "./svglibrary/Soccerball.svg",
   "./svglibrary/Space.svg",
   "./svglibrary/Spring.svg",
   "./svglibrary/Star.svg",

@@ -149,7 +149,7 @@ export default class Record {
     static startRecording (filename) {
         OS.analyticsEvent('editor', 'start_recording');
         volumes = [];
-        if (parseInt(filename) < 0) {
+        if (!filename || parseInt(filename) <= 0) {
             // Error in getting record filename - go back to editor
             recordedSound = undefined;
             isRecording = false;

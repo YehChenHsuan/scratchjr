@@ -163,6 +163,27 @@ let mediaStream = null;
 let videoEl = null;
 let mediaRecorder = null;
 let recordedChunks = [];
+let recordingName = null;
+
+function releaseRecordingStream () {
+    if (mediaRecorder && mediaRecorder.stream) {
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
+}
+
+function getAssetURL (dir, name) {
+    // Keep assets below the current document. A leading slash escapes the
+    // GitHub Pages project subpath (for example, /scratchjr/).
+    const relative = [dir, name].filter(part => part && part !== '.').join('/');
+    return new URL('./' + relative.replace(/^\/+/, ''), document.baseURI).toString();
+}
+
+function base64ToArrayBuffer (data) {
+    const binary = atob(data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes.buffer;
+}
 
 export default class Web {
     // ---- Database ---------------------------------------------------------
@@ -225,7 +246,13 @@ export default class Web {
     // ---- Sound ------------------------------------------------------------
     static registerSound (dir, name, fcn) {
         if (!audioCtx) { cb(fcn, '0'); return; }
-        fetch(dir + '/' + name).then(r => r.arrayBuffer())
+        tx(STORE_MEDIA).then(store => p(store.get(name))).then(record => {
+            if (record && record.data) return base64ToArrayBuffer(record.data);
+            return fetch(getAssetURL(dir, name)).then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.arrayBuffer();
+            });
+        })
             .then(buf => audioCtx.decodeAudioData(buf))
             .then(a => { soundBuffers[name] = a; cb(fcn, '1'); })
             .catch(() => cb(fcn, '0'));
@@ -250,31 +277,45 @@ export default class Web {
 
     // ---- Sound recording --------------------------------------------------
     static sndrecord (fcn) {
-        if (!navigator.mediaDevices) { cb(fcn, '0'); return; }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined') {
+            cb(fcn, '-1'); return;
+        }
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+            if (mediaRecorder) releaseRecordingStream();
             recordedChunks = [];
+            recordingName = 'rec_' + Date.now() + '.webm';
             mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
             mediaRecorder.start();
-            cb(fcn, '1');
-        }).catch(() => cb(fcn, '0'));
+            cb(fcn, recordingName);
+        }).catch(() => cb(fcn, '-1'));
     }
     static recordstop (fcn) {
         if (!mediaRecorder) { cb(fcn, ''); return; }
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedChunks);
+        const recorder = mediaRecorder;
+        mediaRecorder = null;
+        recorder.onstop = () => {
+            const blob = new Blob(recordedChunks, {type: recorder.mimeType || 'audio/webm'});
             const reader = new FileReader();
             reader.onloadend = () => {
                 const b64 = (reader.result || '').split(',')[1] || '';
-                const name = 'rec_' + Date.now() + '.wav';
-                tx(STORE_MEDIA, 'readwrite').then(s => p(s.put({md5: name, data: b64, ext: 'wav'})))
-                    .then(() => cb(fcn, name));
+                const name = recordingName;
+                if (!b64 || !name) { cb(fcn, '-1'); return; }
+                tx(STORE_MEDIA, 'readwrite').then(s => p(s.put({md5: name, data: b64, ext: 'webm'})))
+                    .then(() => cb(fcn, name))
+                    .catch(() => cb(fcn, '-1'));
             };
+            reader.onerror = () => cb(fcn, '-1');
             reader.readAsDataURL(blob);
-            mediaRecorder.stream.getTracks().forEach(t => t.stop());
-            mediaRecorder = null;
+            recorder.stream.getTracks().forEach(t => t.stop());
         };
-        mediaRecorder.stop();
+        try {
+            if (recorder.state !== 'inactive') recorder.stop();
+            else cb(fcn, '');
+        } catch (e) {
+            recorder.stream.getTracks().forEach(track => track.stop());
+            cb(fcn, '-1');
+        }
     }
     static volume (fcn) { cb(fcn, '0.5'); }
     static startplay (fcn) { cb(fcn, '1'); }
