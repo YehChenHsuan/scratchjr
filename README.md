@@ -1,96 +1,60 @@
-## Overview
-This is the official git repository hosting the source code for the
-[ScratchJr](http://scratchjr.org/) project.
+# ScratchJr Web Edition
 
-ScratchJr can be built both for iOS and Android.
-A pure-web version is planned to follow at some point in the future.
+[繁體中文](README.md) | [简体中文](README.zh-CN.md) | [English](README.en.md)
 
-Platform | Status
--------- | -------------
-iOS      | Released in App Store
-Android  | Released in Google Play
+這是以 [LLK/scratchjr](https://github.com/LLK/scratchjr) 為基礎的 ScratchJr 網頁版衍生專案。原始專案主要為 iOS 與 Android App；本專案將其轉為可部署在 GitHub Pages、Netlify 等靜態網站服務的純前端 Web App。
 
-## Architecture Overview
-The diagram below illustrates the architecture of ScratchJr and
-how the iOS (functional), Android (functional) and pure HTML5 (future)
-versions share a common client.
+目前公開版本：<https://yehchenhsuan.github.io/scratchjr/>
 
-![Scratch Jr. Architecture Diagram](doc/scratchjr_architecture.png)
+## 專案特色
 
+- **為網頁而生的本機體驗：** 專案與媒體資料儲存在 IndexedDB。`src/tablet/Web.js` 以網頁 API 取代原本 iOS／Android bridge：相機使用 `getUserMedia`，錄音使用 `MediaRecorder` 與 Web Audio API。
+- **AI 手勢辨識：** 新增青綠色第七類積木與 `ongesture` 事件積木。使用者可訓練自己的手勢，讓手勢觸發程式；分類器使用手部關鍵點（landmark）的 KNN，而非已移除的 MobileNet／TensorFlow.js，藉此降低 PWA 離線快取體積。
+- **可完整離線使用的 PWA：** 首次連線時會下載離線資源包，底部會顯示進度列，完成後顯示通知。Service Worker 提供可續傳的 `GET_CACHE_STATUS` 狀態機制，安裝完成後可離線啟動與使用。
+- **更豐富的創作素材：** 相較 Desktop 版，角色庫新增 119 個角色與 28 個背景。
+- **WAP 分享與下載：** 專案可下載到本機，也可在支援的裝置上透過 Web Share API 開啟系統分享面板，提供類似 AirDrop 的分享流程。
 
-## Directory Structure and Projects
-This repository has the following directory structure:
+## 快速開始
 
-* <tt>src/</tt> - Shared JavaScript code for iOS and Android common client. This is where most changes should be made for features, bug fixes, UI, etc.
-* <tt>editions/</tt> - Assembly directories for each "flavor" of ScratchJr. These symlink to src for common code, and could diverge in settings and assets.
-  * <tt>free/</tt> - Free edition JavaScript, including all shared code for all releases
-* <tt>android/</tt> - Android port of Scratch Jr. (Java, Android Studio Projects)
-  * <tt>ScratchJr/</tt> - Android Studio Project for ScratchJr Android Application
-* <tt>bin/</tt> - Build scripts and other executables
-* <tt>doc/</tt> - Developer Documentation
-* <tt>ios/</tt> - Xcode project for iOS build. (Make sure to open <tt>ScratchJr.xcworkspace</tt> not <tt>ScratchJr.xcodeproj</tt>)
+需要 Node.js 與 npm。先安裝相依套件：
 
-## Building ScratchJr
+```bash
+npm install
+```
 
-### Initial setup
+開發時，先建立開發用 bundle，再啟動靜態伺服器並開啟 <http://localhost:8080/index.html>：
 
-Regardless of whether you are doing iOS development or Android development, you should do these steps.
+```bash
+npm run dev
+npm run serve
+```
 
-*These instructions assume you are building both versions on Mac OSX, with [Homebrew](http://brew.sh) installed.*
+持續監看程式變更可改用：
 
-1. Clone or update the code for this repo
-2. Ensure you have node and npm [installed](https://www.npmjs.com/get-npm).
-3. Run <tt>sudo easy_install pysvg</tt> to install python svg libraries
-4. Run <tt>brew install librsvg</tt> to install commandline `rsvg-convert`
-5. Run <tt>brew install imagemagick</tt> to install commandline `magick`
-6. In the top level of the scratchjr repo directory, install npm dependencies for bundling the JavaScript: <tt>npm install</tt>
+```bash
+npm run watch
+```
 
-### Analytics
-ScratchJr uses the Firebase SDK to record analytics for the app. Scratch Team developers should look for
-the configuration files in the Scratch Devs Vault. If you're not on the Scratch Team, then you'll need to
-set up your own [app analytics](https://firebase.google.com/products/analytics) with Google Firebase. It's free. Firebase will generate the configuration files for you to download.
+相機功能需要安全環境；瀏覽器中的 `localhost` 可用於本機測試，部署時請使用 HTTPS。
 
-1. Place the `google-services.json` file in `editions/free/android-resources`
-2. Place the `GoogleService-Info.plist` file in `editions/free/ios-resources`
+## 建置與部署
 
-### iOS
+GitHub Pages 的發布目錄是 `docs/`。以下指令會同步 AI 資源、產生 PWA 圖示、建立 production bundle，並重建 `docs/`：
 
-1. To build the iOS version, you need to have a Mac with Xcode
-2. Run <tt>brew install cocoapods</tt> to install CocoaPods
-3. Run <tt>pod install</tt> to install the Firebase Analytics dependencies
-4. Open Xcode
-5. In Xcode, open <tt>ios/ScratchJr.xcworkspace</tt>
+```bash
+npm run build:web
+```
 
-### Android
+在 GitHub 儲存庫設定中，將 Pages 設為從分支的 `/docs` 目錄發布。將更新後的 `docs/` 提交並推送，即可更新 GitHub Pages。
 
-1. Install or update Android Studio
-2. In Android Studio, open the project <tt>android/ScratchJr</tt>
-3. Choose the appropriate flavor/build variant in Android Studio
+若要建立另一份可部署的最佳化 PWA 發布樹，執行：
 
-*Note: you can still do Android development on Ubuntu. Instead of the install commands above, run:*
+```bash
+npm run package:pwa
+```
 
-1. <tt>sudo easy_install pysvg</tt> to install python svg libraries
-2. <tt>sudo apt-get install librsvg2-bin</tt> to install rsvg-convert
-3. <tt>sudo apt-get install imagemagick</tt> to install ImageMagick
+它會輸出至 `dist/pwa/`；此目錄可作為 Netlify 等靜態主機的部署來源。完整檢查與打包流程可使用 `npm run release:pwa`。
 
-## Where and how to make changes
+## 授權與商標
 
-All changes should be made in a fork. Before making a pull request, ensure all changes pass our linter:
-* <tt>npm run lint</tt>
-
-For more information, see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Code credits
-ScratchJr would not be possible without free and open source libraries, including:
-* [Snap.svg](https://github.com/adobe-webplatform/Snap.svg/)
-* [JSZip](https://github.com/Stuk/jszip)
-* [Intl.js](https://github.com/andyearnshaw/Intl.js)
-* [Yahoo intl-messageformat](https://github.com/yahoo/intl-messageformat)
-
-## Acknowledgments
-ScratchJr is a collaborative effort between:
-
-* [Tufts DevTech Research Group](http://ase.tufts.edu/devtech/)
-* [Lifelong Kindergarten group at MIT Media Lab](http://llk.media.mit.edu/)
-* [Playful Invention Company](http://www.playfulinvention.com/)
-* [Two Sigma Investments](http://twosigma.com)
+本專案延續上游的 [BSD-3-Clause 授權](LICENSE)。ScratchJr 的名稱與商標屬於 MIT Media Lab。本衍生專案所加入的網頁化 bridge、AI 手勢辨識、離線 PWA、WAP 分享等功能，為本專案的衍生貢獻，不代表 MIT Media Lab 的官方產品或背書。
