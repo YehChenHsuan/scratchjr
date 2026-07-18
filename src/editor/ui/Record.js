@@ -60,6 +60,10 @@ export default class Record {
     // Dialog box hide/show
     static appear () {
         OS.analyticsEvent('editor', 'record_dialog_open');
+        // The fixed viewport makes #frame a stacking context. Move the
+        // backdrop into it while recording so the dialog's z-index stays
+        // above the backdrop and both layers use the same viewport scale.
+        frame.appendChild(gn('backdrop'));
         gn('backdrop').setAttribute('class', 'modal-backdrop fade in');
         setProps(gn('backdrop').style, {
             display: 'block'
@@ -77,6 +81,7 @@ export default class Record {
             setProps(gn('backdrop').style, {
                 display: 'none'
             });
+            frame.parentNode.appendChild(gn('backdrop'));
             gn('recorddialog').setAttribute('class', 'record fade');
         }, 333);
         dialogOpen = false;
