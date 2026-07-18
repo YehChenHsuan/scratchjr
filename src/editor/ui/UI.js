@@ -841,8 +841,8 @@ export default class UI {
     }
 
     static enterFullScreen () {
-        var w = Math.min(getDocumentWidth(), frame.offsetWidth);
-        var h = Math.max(getDocumentHeight(), frame.offsetHeight);
+        var w = frame.offsetWidth;
+        var h = frame.offsetHeight;
         frame.appendChild(gn('stage'));
         var list = ['go', 'full'];
         for (var i = 0; i < list.length; i++) {
