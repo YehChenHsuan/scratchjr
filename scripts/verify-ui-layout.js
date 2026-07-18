@@ -6,7 +6,7 @@ const path = require('path');
 const sharp = require('sharp');
 
 const ROOT = path.resolve(__dirname, '..');
-const SCREENSHOTS = path.join(ROOT, 'docs', 'ui-audit', 'screenshots');
+const SCREENSHOTS = path.join(ROOT, 'ui-audit', 'screenshots');
 const REQUIRED = [
     '11-fixed-1280x720.png',
     '12-fixed-960x600.png',

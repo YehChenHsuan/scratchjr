@@ -33,3 +33,6 @@
 ios/Pods
 google-services.json
 GoogleService-Info.plist
+
+# Local Netlify CLI state (site id, machine-local paths):
+/.netlify/
