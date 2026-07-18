@@ -36,3 +36,10 @@ GoogleService-Info.plist
 
 # Local Netlify CLI state (site id, machine-local paths):
 /.netlify/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
