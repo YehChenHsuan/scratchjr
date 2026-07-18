@@ -37,7 +37,7 @@ const HAND_CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],
     [13,17],[17,18],[18,19],[19,20],[0,17]];
 
 export default class GestureEngine {
-    constructor () {
+    constructor ({drawOverlay = true} = {}) {
         this.knn = null;
         this.stream = null;
         this.videoEl = null;
@@ -53,6 +53,12 @@ export default class GestureEngine {
         this.lastHandFrame = 0;
         this.extendedFingerCount = null;
         this.latestFeature = null;
+        this.drawOverlay = drawOverlay;
+        this.overlayWidth = 0;
+        this.overlayHeight = 0;
+        this.modelComplexity = 1;
+        this.frameTimings = [];
+        this.perfDecisionMade = false;
     }
 
     onGestureDetected (cb) {
@@ -62,7 +68,10 @@ export default class GestureEngine {
     async startCameraOnly (videoEl, overlayCanvas) {
         const libs = await loadLibs();
         this.videoEl = videoEl;
-        this.stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}});
+        this.stream = await navigator.mediaDevices.getUserMedia({video: {
+            facingMode: 'user', width: {ideal: 640, max: 640},
+            height: {ideal: 480, max: 480}, frameRate: {ideal: 15, max: 15}
+        }});
         videoEl.srcObject = this.stream;
         await videoEl.play();
         await this._startHandTracking(libs.Hands, overlayCanvas);
@@ -83,53 +92,50 @@ export default class GestureEngine {
         }
 
         if (!this.stream) {
-            this.stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}});
+            this.stream = await navigator.mediaDevices.getUserMedia({video: {
+                facingMode: 'user', width: {ideal: 640, max: 640},
+                height: {ideal: 480, max: 480}, frameRate: {ideal: 15, max: 15}
+            }});
             videoEl.srcObject = this.stream;
             await videoEl.play();
         }
         this.videoEl = videoEl;
         await this._startHandTracking(libs.Hands, overlayCanvas);
         this.running = true;
-        this._loop();
     }
 
-    async _loop () {
-        while (this.running) {
-            try {
-                if (this.knn && this.knn.getNumClasses() > 0) {
-                    const feature = this.latestFeature;
-                    if (!feature) {
-                        this.streakLabel = null;
-                        this.streakCount = 0;
-                        await new Promise(r => setTimeout(r, 120));
-                        continue;
-                    }
-                    const result = this.knn.predict(feature);
-                    const label = this._resolveLabel(result);
-                    const conf = result.confidences[label] || 0;
-                    if (conf >= CONFIDENCE_THRESHOLD) {
-                        if (this.streakLabel === label) {
-                            this.streakCount++;
-                        } else {
-                            this.streakLabel = label;
-                            this.streakCount = 1;
-                        }
-                        if (this.streakCount >= STABLE_FRAMES &&
-                            Date.now() - this.lastTrigger > COOLDOWN_MS) {
-                            this.lastTrigger = Date.now();
-                            this.streakCount = 0;
-                            if (this.onDetect) {
-                                this.onDetect(label, conf);
-                            }
-                        }
-                    } else {
-                        this.streakLabel = null; this.streakCount = 0;
-                    }
-                }
-            } catch (e) {
-                window.console.warn('[GestureEngine] inference error', e);
+    _classifyLatestFeature () {
+        try {
+            if (!this.running || !this.knn || this.knn.getNumClasses() === 0) return;
+            const feature = this.latestFeature;
+            if (!feature) {
+                this.streakLabel = null;
+                this.streakCount = 0;
+                return;
             }
-            await new Promise(r => setTimeout(r, 200));
+            const result = this.knn.predict(feature);
+            if (!result) return;
+            const label = this._resolveLabel(result);
+            const conf = result.confidences[label] || 0;
+            if (conf >= CONFIDENCE_THRESHOLD) {
+                if (this.streakLabel === label) {
+                    this.streakCount++;
+                } else {
+                    this.streakLabel = label;
+                    this.streakCount = 1;
+                }
+                if (this.streakCount >= STABLE_FRAMES &&
+                    Date.now() - this.lastTrigger > COOLDOWN_MS) {
+                    this.lastTrigger = Date.now();
+                    this.streakCount = 0;
+                    if (this.onDetect) this.onDetect(label, conf);
+                }
+            } else {
+                this.streakLabel = null;
+                this.streakCount = 0;
+            }
+        } catch (e) {
+            window.console.warn('[GestureEngine] inference error', e);
         }
     }
 
@@ -169,7 +175,7 @@ export default class GestureEngine {
             this.hands = new Hands({locateFile: file => AI_ROOT + 'mediapipe/' + file});
             this.hands.setOptions({
                 maxNumHands: 1,
-                modelComplexity: 1,
+                modelComplexity: this.modelComplexity,
                 minDetectionConfidence: 0.72,
                 minTrackingConfidence: 0.72
             });
@@ -182,7 +188,9 @@ export default class GestureEngine {
             if (Date.now() - this.lastHandFrame > 90 && this.videoEl.readyState >= 2) {
                 this.lastHandFrame = Date.now();
                 try {
+                    const startedAt = performance.now();
                     await this.hands.send({image: this.videoEl});
+                    this._recordHandTrackingTime(performance.now() - startedAt);
                 } catch (e) {
                     window.console.warn('[GestureEngine] hand tracking error', e);
                 }
@@ -190,6 +198,20 @@ export default class GestureEngine {
             window.requestAnimationFrame(track);
         };
         track();
+    }
+
+    _recordHandTrackingTime (elapsed) {
+        if (this.perfDecisionMade) return;
+        this.frameTimings.push(elapsed);
+        if (this.frameTimings.length < 12) return;
+        const slowFrames = this.frameTimings.filter(time => time > 120).length;
+        this.perfDecisionMade = true;
+        if (slowFrames >= 8 && this.modelComplexity === 1) {
+            this.modelComplexity = 0;
+            this.hands.setOptions({modelComplexity: 0});
+            window.console.info('[GestureEngine] switched to lite hand model after slow frames');
+        }
+        this.frameTimings = [];
     }
 
     // Counts fingers held straight (index/middle/ring/pinky) using the
@@ -229,10 +251,17 @@ export default class GestureEngine {
         this.handDetected = Boolean(landmarks);
         this.latestFeature = LandmarkClassifier.featureFromLandmarks(landmarks, handedness);
         this.extendedFingerCount = landmarks ? GestureEngine.countExtendedFingers(landmarks) : null;
+        this._classifyLatestFeature();
         const overlay = this.overlayCanvas;
-        if (overlay) {
-            overlay.width = this.videoEl.videoWidth || 640;
-            overlay.height = this.videoEl.videoHeight || 480;
+        if (overlay && this.drawOverlay) {
+            const width = this.videoEl.videoWidth || 640;
+            const height = this.videoEl.videoHeight || 480;
+            if (this.overlayWidth !== width || this.overlayHeight !== height) {
+                overlay.width = width;
+                overlay.height = height;
+                this.overlayWidth = width;
+                this.overlayHeight = height;
+            }
             const ctx = overlay.getContext('2d');
             ctx.clearRect(0, 0, overlay.width, overlay.height);
             if (landmarks) {

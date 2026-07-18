@@ -9,6 +9,7 @@ const FILES = [
     ['@mediapipe/hands/hands.js', 'mediapipe/hands.js'],
     ['@mediapipe/hands/hands.binarypb', 'mediapipe/hands.binarypb'],
     ['@mediapipe/hands/hand_landmark_full.tflite', 'mediapipe/hand_landmark_full.tflite'],
+    ['@mediapipe/hands/hand_landmark_lite.tflite', 'mediapipe/hand_landmark_lite.tflite'],
     ['@mediapipe/hands/hands_solution_packed_assets.data', 'mediapipe/hands_solution_packed_assets.data'],
     ['@mediapipe/hands/hands_solution_packed_assets_loader.js', 'mediapipe/hands_solution_packed_assets_loader.js'],
     ['@mediapipe/hands/hands_solution_simd_wasm_bin.js', 'mediapipe/hands_solution_simd_wasm_bin.js'],

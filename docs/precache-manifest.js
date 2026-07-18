@@ -1,4 +1,4 @@
-self.__SCRATCHJR_PRECACHE_VERSION="292dcdd1e4ce2791";
+self.__SCRATCHJR_PRECACHE_VERSION="38a459f5cc4756ca";
 self.__SCRATCHJR_CORE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
@@ -701,6 +701,7 @@ self.__SCRATCHJR_CORE_URLS=[
 ];
 self.__SCRATCHJR_AI_URLS=[
   "./vendor/ai/mediapipe/hand_landmark_full.tflite",
+  "./vendor/ai/mediapipe/hand_landmark_lite.tflite",
   "./vendor/ai/mediapipe/hands.binarypb",
   "./vendor/ai/mediapipe/hands.js",
   "./vendor/ai/mediapipe/hands_solution_packed_assets.data",

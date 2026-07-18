@@ -42,6 +42,14 @@ export function aiTrainerMain () {
     let selectedId = null;
     let trainer = null;
     let initRequest = 0;
+    let testTimer = null;
+    let testInFlight = false;
+
+    function stopContinuousTest () {
+        if (testTimer) clearInterval(testTimer);
+        testTimer = null;
+        testInFlight = false;
+    }
 
     function bindPress (element, handler) {
         let lastPress = 0;
@@ -60,6 +68,7 @@ export function aiTrainerMain () {
     }
 
     function selectGesture (id) {
+        stopContinuousTest();
         selectedId = id;
         Array.from(grid.children).forEach(cell => {
             cell.classList.toggle('selected', cell.dataset.id === id);
@@ -122,6 +131,7 @@ export function aiTrainerMain () {
     }
 
     bindPress(document.getElementById('ait-back'), () => {
+        stopContinuousTest();
         initRequest++;
         if (trainer) {
             trainer.dispose();
@@ -132,9 +142,13 @@ export function aiTrainerMain () {
         window.location.href = back;
     });
 
-    bindPress(document.getElementById('ait-camera'), () => initializeTrainer());
+    bindPress(document.getElementById('ait-camera'), () => {
+        stopContinuousTest();
+        initializeTrainer();
+    });
 
     bindPress(document.getElementById('ait-next'), () => {
+        stopContinuousTest();
         const current = GESTURE_DEFS.findIndex(def => def.id === selectedId);
         for (let offset = 1; offset <= GESTURE_DEFS.length; offset++) {
             const def = GESTURE_DEFS[(current + offset + GESTURE_DEFS.length) % GESTURE_DEFS.length];
@@ -147,6 +161,7 @@ export function aiTrainerMain () {
     });
 
     bindPress(document.getElementById('ait-reset'), () => {
+        stopContinuousTest();
         if (!trainer || !selectedId) {
             setStatus('error', 'Select a gesture first.');
             return;
@@ -158,6 +173,7 @@ export function aiTrainerMain () {
     });
 
     bindPress(document.getElementById('ait-collect'), () => {
+        stopContinuousTest();
         if (!selectedId || !trainer) {
             setStatus('error', 'Select a gesture first.');
             return;
@@ -173,30 +189,48 @@ export function aiTrainerMain () {
     });
 
     bindPress(document.getElementById('ait-stop'), () => {
+        stopContinuousTest();
         if (trainer) {
             trainer.stopCollecting();
         }
         setStatus('stop', 'Stopped');
     });
 
-    bindPress(document.getElementById('ait-test'), async () => {
-        if (!trainer) {
+    bindPress(document.getElementById('ait-test'), () => {
+        if (!trainer) return;
+        if (testTimer) {
+            stopContinuousTest();
+            setResult('empty', 'Continuous test stopped.');
             return;
         }
-        const res = await trainer.testOnce();
-        if (!res) {
-            setResult('empty', 'No trained gestures yet.');
-            return;
-        }
-        const num = gestureNumber(res.label);
-        setResult('hit', `Detected ${gestureShortLabel(res.label)} ` +
-            `(${(res.confidences[res.label] * 100).toFixed(0)}%)`, String(num));
-        Array.from(grid.children).forEach(cell => {
-            cell.classList.toggle('detected', cell.dataset.id === res.label);
-        });
+        const testCurrentPose = async () => {
+            if (testInFlight || !trainer) return;
+            testInFlight = true;
+            try {
+                const res = await trainer.testOnce();
+                if (!res) {
+                    setResult('empty', 'No trained gestures yet.');
+                    return;
+                }
+                const num = gestureNumber(res.label);
+                setResult('hit', `Detected ${gestureShortLabel(res.label)} ` +
+                    `(${(res.confidences[res.label] * 100).toFixed(0)}%)`, String(num));
+                Array.from(grid.children).forEach(cell => {
+                    cell.classList.toggle('detected', cell.dataset.id === res.label);
+                });
+            } catch (e) {
+                window.console.warn('[GestureTrainer] continuous test error', e);
+                setResult('empty', 'Test failed.');
+            } finally {
+                testInFlight = false;
+            }
+        };
+        testCurrentPose();
+        testTimer = setInterval(testCurrentPose, 250);
     });
 
     bindPress(document.getElementById('ait-save'), async () => {
+        stopContinuousTest();
         if (!trainer) {
             return;
         }
@@ -215,6 +249,7 @@ export function aiTrainerMain () {
     });
 
     async function initializeTrainer () {
+        stopContinuousTest();
         const request = ++initRequest;
         let nextTrainer = null;
         if (trainer) {
@@ -245,6 +280,11 @@ export function aiTrainerMain () {
             setStatus('error', 'Init failed: ' + e.message);
         }
     }
+
+    window.addEventListener('pagehide', () => {
+        stopContinuousTest();
+        if (trainer) trainer.dispose();
+    }, {once: true});
 
     initializeTrainer();
 }
