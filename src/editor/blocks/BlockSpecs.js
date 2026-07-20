@@ -1,6 +1,7 @@
 import Localization from '../../utils/Localization';
 import IO from '../../tablet/IO';
 import {GESTURE_DEFS, gestureIconName, gestureShortLabel} from '../../gesture/GestureDefs';
+import {PITCH_ICONS, pitchShortLabel} from '../../gesture/PitchDefs';
 
 let loadCount = 0;
 
@@ -228,6 +229,8 @@ export default class BlockSpecs {
             'ongesture': ['ongesture', BlockSpecs.getImageFrom('assets/blockicons/Gesture', 'svg'),
                 BlockSpecs.yellowStart, 'g', 'gesture_1_up',
                 BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
+            'onpitch': ['onpitch', PITCH_ICONS, BlockSpecs.yellowStart, 'm', 'do',
+                BlockSpecs.yellowStartH, null, null, BlockSpecs.startS],
             'message': ['message', sendshapes, BlockSpecs.yellowCmd, 'm', 'Orange',
                 BlockSpecs.yellowCmdH, null, null, BlockSpecs.cmdS],
 
@@ -344,7 +347,8 @@ export default class BlockSpecs {
             'message': Localization.localize('BLOCK_DESC_SEND_MESSAGE', {
                 COLOR: Localization.localize('BLOCK_DESC_MESSAGE_COLOR_ORANGE')
             }),
-            'ongesture': 'AI gesture: ' + gestureShortLabel(str)
+            'ongesture': 'AI gesture: ' + gestureShortLabel(str),
+            'onpitch': 'Sound pitch: ' + pitchShortLabel(str)
         };
     }
 

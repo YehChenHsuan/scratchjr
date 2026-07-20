@@ -1,4 +1,4 @@
-self.__SCRATCHJR_PRECACHE_VERSION="38a459f5cc4756ca";
+self.__SCRATCHJR_PRECACHE_VERSION="c4e926a6db1f10da";
 self.__SCRATCHJR_CORE_URLS=[
   "./aitrainer.html",
   "./app.bundle.js",
@@ -46,6 +46,13 @@ self.__SCRATCHJR_CORE_URLS=[
   "./assets/blockicons/LetterSend_Yellow.svg",
   "./assets/blockicons/Microphone.svg",
   "./assets/blockicons/OnTouch.svg",
+  "./assets/blockicons/Pitch_do.svg",
+  "./assets/blockicons/Pitch_fa.svg",
+  "./assets/blockicons/Pitch_la.svg",
+  "./assets/blockicons/Pitch_mi.svg",
+  "./assets/blockicons/Pitch_re.svg",
+  "./assets/blockicons/Pitch_si.svg",
+  "./assets/blockicons/Pitch_sol.svg",
   "./assets/blockicons/Repeat.svg",
   "./assets/blockicons/Reset.svg",
   "./assets/blockicons/Right.svg",

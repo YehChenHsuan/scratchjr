@@ -502,7 +502,7 @@ export default class Project {
     static encodeStrip (b) {
         var res = [];
         var hasargs = ['playsnd', 'gotopage', 'playusersnd', 'setcolor', 'onmessage', 'message', 'setspeed',
-            'ongesture'];
+            'ongesture', 'onpitch'];
         var loops = ['repeat'];
         var carets = ['caretcmd', 'caretend', 'caretstart'];
         while (b != null) {
