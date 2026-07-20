@@ -1,8 +1,10 @@
 import {PITCH_DEFS} from './PitchDefs';
 
 const C4 = 261.63;
-const STABLE_MS = 150;
-const COOLDOWN_MS = 1500;
+/** Allows a few consistent frames to reject breath/transient pitch noise without noticeable delay. */
+const STABLE_MS = 75;
+/** Prevents same-note vibrato/decay retriggers while allowing immediate transitions to another pitch. */
+const COOLDOWN_MS = 500;
 const MIN_RMS = 0.01;
 const MAX_CENTS_ERROR = 70;
 
@@ -18,7 +20,7 @@ export default class PitchDetector {
         this.onDetect = null;
         this.streakPitch = null;
         this.streakStartedAt = 0;
-        this.lastTrigger = 0;
+        this.lastTriggerByPitch = new Map();
     }
 
     onPitchDetected (cb) {
@@ -59,8 +61,9 @@ export default class PitchDetector {
         const now = Date.now();
         if (pitch) {
             if (pitch === this.streakPitch) {
-                if (now - this.streakStartedAt >= STABLE_MS && now - this.lastTrigger >= COOLDOWN_MS) {
-                    this.lastTrigger = now;
+                const lastTrigger = this.lastTriggerByPitch.get(pitch);
+                if (now - this.streakStartedAt >= STABLE_MS && (lastTrigger === undefined || now - lastTrigger >= COOLDOWN_MS)) {
+                    this.lastTriggerByPitch.set(pitch, now);
                     this.streakStartedAt = now;
                     if (this.onDetect) this.onDetect(pitch);
                 }
@@ -105,6 +108,7 @@ export default class PitchDetector {
         this.stream = null;
         this.buffer = null;
         this.streakPitch = null;
+        this.lastTriggerByPitch.clear();
     }
 
     static autocorrelate (buffer, sampleRate) {
