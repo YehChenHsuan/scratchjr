@@ -190,7 +190,7 @@ export default class BlockSpecs {
 
 
     static setupPalettesDef () {
-        return [['onflag', 'onclick', 'ontouch', 'onmessage', 'message'],
+        return [['onflag', 'onclick', 'ontouch', 'onmessage', 'onpitch', 'message'],
             ['forward', 'back', 'up', 'down', 'right', 'left', 'hop', 'home'],
             ['say', 'space', 'grow', 'shrink', 'same', 'space', 'hide', 'show'],
             [],
