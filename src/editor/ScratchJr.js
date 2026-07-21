@@ -18,6 +18,7 @@ import BlockSpecs from './blocks/BlockSpecs';
 import Runtime from './engine/Runtime';
 import GestureEngine from '../gesture/GestureEngine';
 import GestureStorage from '../gesture/GestureStorage';
+import PitchDetector from '../gesture/PitchDetector';
 import Localization from '../utils/Localization';
 import {libInit, gn, scaleMultiplier, newHTML,
     isAndroid, getUrlVars, CSSTransition3D, frame} from '../utils/lib';
@@ -36,6 +37,9 @@ let gestureVideo = undefined;
 let gesturePreview = undefined;
 let gestureOverlay = undefined;
 let gestureStartRequest = 0;
+let pitchDetector = undefined;
+let pitchIndicator = undefined;
+let pitchStartRequest = 0;
 let stage = undefined;
 let inFullscreen = false;
 let keypad = undefined;
@@ -456,6 +460,7 @@ export default class ScratchJr {
         ScratchJr.resetSprites();
         ScratchJr.startCurrentPageStrips(['onflag', 'ontouch']);
         ScratchJr.startGestureCamera();
+        ScratchJr.startPitchDetector();
     }
 
     static startCurrentPageStrips (list) {
@@ -492,6 +497,7 @@ export default class ScratchJr {
     static stopStrips () {
         runtime.stopThreads();
         ScratchJr.stopGestureCamera();
+        ScratchJr.stopPitchDetector();
         stage.currentPage.updateThumb();
     }
 
@@ -547,6 +553,42 @@ export default class ScratchJr {
         }
     }
 
+    static async startPitchDetector () {
+        if (!ScratchJr.hasPitchScripts()) return;
+        var requestId = ++pitchStartRequest;
+        if (!pitchIndicator) {
+            pitchIndicator = document.createElement('div');
+            pitchIndicator.className = 'pitch-mic-indicator';
+            pitchIndicator.setAttribute('aria-label', 'Microphone listening for pitch');
+            pitchIndicator.title = 'Listening for Do Re Mi Fa Sol La Si';
+            pitchIndicator.textContent = '♪';
+            Object.assign(pitchIndicator.style, {
+                position: 'absolute', right: '10px', top: '10px', zIndex: 100000,
+                width: '32px', height: '32px', lineHeight: '32px', textAlign: 'center',
+                borderRadius: '16px', color: '#ffffff', background: '#00BCD4', fontSize: '22px'
+            });
+            document.body.appendChild(pitchIndicator);
+        }
+        pitchIndicator.style.display = 'block';
+        if (!pitchDetector) {
+            pitchDetector = new PitchDetector();
+            pitchDetector.onPitchDetected(pitchId => ScratchJr.startScriptsForPitch(pitchId));
+        }
+        try {
+            await pitchDetector.start();
+            if (requestId != pitchStartRequest) ScratchJr.stopPitchDetector();
+        } catch (e) {
+            if (pitchIndicator) pitchIndicator.style.display = 'none';
+            console.warn('[PitchDetector] start failed', e);
+        }
+    }
+
+    static stopPitchDetector () {
+        pitchStartRequest++;
+        if (pitchDetector) pitchDetector.stop();
+        if (pitchIndicator) pitchIndicator.style.display = 'none';
+    }
+
     static hasGestureScripts () {
         var page = stage.currentPage.div;
         for (var i = 0; i < page.childElementCount; i++) {
@@ -558,6 +600,16 @@ export default class ScratchJr {
             if (sc.owner.getBlocksType(['ongesture']).length > 0) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    static hasPitchScripts () {
+        var page = stage.currentPage.div;
+        for (var i = 0; i < page.childElementCount; i++) {
+            var spr = page.childNodes[i].owner;
+            if (spr && gn(spr.id + '_scripts') &&
+                gn(spr.id + '_scripts').owner.getBlocksType(['onpitch']).length > 0) return true;
         }
         return false;
     }
@@ -575,6 +627,18 @@ export default class ScratchJr {
                 if (topblocks[j].getArgValue() == gestureId) {
                     runtime.addRunScript(spr, topblocks[j]);
                 }
+            }
+        }
+    }
+
+    static startScriptsForPitch (pitchId) {
+        var page = stage.currentPage.div;
+        for (var i = 0; i < page.childElementCount; i++) {
+            var spr = page.childNodes[i].owner;
+            if (!spr || !gn(spr.id + '_scripts')) continue;
+            var topblocks = gn(spr.id + '_scripts').owner.getBlocksType(['onpitch']);
+            for (var j = 0; j < topblocks.length; j++) {
+                if (topblocks[j].getArgValue() == pitchId) runtime.addRunScript(spr, topblocks[j]);
             }
         }
     }
